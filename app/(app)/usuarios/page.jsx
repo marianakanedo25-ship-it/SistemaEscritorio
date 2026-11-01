@@ -3,6 +3,7 @@ import { exigir, ABAS } from '@/lib/auth';
 import Modal from '@/components/Modal';
 import ConfirmButton from '@/components/ConfirmButton';
 import UsuarioCampos from '@/components/UsuarioCampos';
+import ExemplosAviso from '@/components/ExemplosAviso';
 import { salvarUsuario, excluirUsuario } from './actions';
 
 export const metadata = { title: 'Usuários' };
@@ -45,6 +46,12 @@ export default async function UsuariosPage() {
           </tbody>
         </table>
       </div>
+      {eu.papel === 'admin' && (
+        <section style={{ marginTop: 28 }}>
+          <h2 style={{ marginBottom: 10 }}>Dados de exemplo</h2>
+          <ExemplosAviso sempre />
+        </section>
+      )}
       <p className="small" style={{ marginTop: 14 }}>Dica: para a equipe, libere Projetos e Agenda e deixe Financeiro, Calculadora e Usuários só para você.</p>
     </>
   );

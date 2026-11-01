@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { q, one } from '@/lib/db';
 import { exigir, podeVer } from '@/lib/auth';
+import ExemplosAviso from '@/components/ExemplosAviso';
 import { brl, data, hoje, mesAtual, addDias, nomeMes, diasAte, STATUS_CONTRATO } from '@/lib/format';
 
 export const metadata = { title: 'Dashboard' };
@@ -54,6 +55,7 @@ export default async function Dashboard({ searchParams }) {
   return (
     <>
       {sp?.['sem-acesso'] && <div className="notice">Você não tem acesso àquela aba. Peça à administradora para liberar em Usuários.</div>}
+      {u.papel === 'admin' && <ExemplosAviso />}
       <div className="page-head">
         <div><h1>Olá, {nome}</h1><p className="sub">Resumo do escritório · {nomeMes(ym)}</p></div>
         <div className="actions">
