@@ -187,6 +187,7 @@ export default function Calculadora({ cfgInicial, orcInicial, clientes, salvarCf
                 setOrc({ id: res.id }); flash(o.id ? 'Orçamento atualizado' : 'Orçamento salvo');
               })}>{pending ? 'Salvando…' : o.id ? 'Atualizar orçamento' : 'Salvar orçamento'}</button>
               <button type="button" className="btn" onClick={copiar}>Copiar resumo</button>
+              {o.id && <Link className="btn" href={`/precificacao/proposta/${o.id}`}>Proposta para o cliente</Link>}
               {o.id && <Link className="btn ghost" href="/precificacao">Novo cálculo</Link>}
             </div>
             <span className="small" role="status">{msg}</span>

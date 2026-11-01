@@ -71,3 +71,17 @@ export async function criarProjetoDoOrcamento(id) {
   revalidatePath('/projetos');
   redirect(`/projetos/${p.id}`);
 }
+
+/** Guarda o texto editado da proposta dentro do orçamento. */
+export async function salvarProposta(id, p) {
+  await exigir('precificacao');
+  const s = (v, max = 4000) => String(v ?? '').slice(0, max);
+  const limpa = {
+    titulo: s(p.titulo, 200), cliente: s(p.cliente, 200), data: s(p.data, 10), objeto: s(p.objeto),
+    etapas: (Array.isArray(p.etapas) ? p.etapas : []).slice(0, 40).map((e) => ({ nome: s(e.nome, 200), descricao: s(e.descricao, 1000) })),
+    entrega: s(p.entrega), prazo: s(p.prazo), valor: Number(p.valor) || 0, pagamento: s(p.pagamento),
+    naoIncluso: s(p.naoIncluso), validade: s(p.validade, 500), obs: s(p.obs),
+  };
+  await q(`UPDATE orcamentos SET dados = jsonb_set(dados, '{proposta}', $2::jsonb) WHERE id = $1`, [id, JSON.stringify(limpa)]);
+  revalidatePath('/precificacao');
+}

@@ -56,6 +56,7 @@ export default async function PrecificacaoPage({ searchParams }) {
                     <td><ActionButton action={status} classe={'tag ' + (ST[o.status]?.[1] || 'mute')} title="Clique para mudar a situação">{ST[o.status]?.[0] || o.status}</ActionButton></td>
                     <td className="r" style={{ whiteSpace: 'nowrap' }}>
                       <Link className="btn sm" href={`/precificacao?o=${o.id}`}>Abrir</Link>{' '}
+                      <Link className="btn sm" href={`/precificacao/proposta/${o.id}`}>Proposta</Link>{' '}
                       {verProj && (o.projeto_id
                         ? <Link className="btn sm" href={`/projetos/${o.projeto_id}`}>Ver projeto</Link>
                         : <ActionButton action={proj} classe="btn sm" title="Cria o projeto com as etapas deste orçamento e um contrato em rascunho">Criar projeto</ActionButton>)}{' '}
