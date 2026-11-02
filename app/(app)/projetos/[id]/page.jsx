@@ -10,7 +10,7 @@ import SaveForm from '@/components/SaveForm';
 import ProjetoCampos from '@/components/ProjetoCampos';
 import FinCampos from '@/components/FinCampos';
 import EtapasEditor from './EtapasEditor';
-import { salvarProjeto, salvarEtapas, excluirProjeto, salvarContrato, excluirContrato, gerarParcelas } from '../actions';
+import { salvarProjeto, salvarEtapas, excluirProjeto, salvarContrato, excluirContrato, gerarParcelas, etapasDoOrcamento, sincronizarEtapasComOrcamento } from '../actions';
 import { salvarLancamento, alternarPago, excluirLancamento } from '../../financeiro/actions';
 import { salvarEvento } from '../../agenda/actions';
 import EventoCampos from '@/components/EventoCampos';
@@ -46,6 +46,10 @@ export default async function ProjetoPage({ params }) {
     q('SELECT id, titulo, data, hora, tipo, local FROM eventos WHERE projeto_id = $1 AND data >= $2 ORDER BY data, hora LIMIT 8', [p.id, hoje()]),
     q('SELECT id, nome FROM clientes ORDER BY lower(nome)'),
   ]);
+  const orcEtapas = await etapasDoOrcamento(p.id);
+  const sobrando = orcEtapas ? etapas.filter((e) => orcEtapas.todas.includes(e.nome) && !orcEtapas.validas.includes(e.nome)) : [];
+  const faltando = orcEtapas ? orcEtapas.validas.filter((n) => !etapas.some((e) => e.nome === n)) : [];
+  async function sincronizar() { 'use server'; await sincronizarEtapasComOrcamento(p.id); }
   const verFin = podeVer(u, 'financeiro');
   const [receitas, custos] = verFin ? await Promise.all([
     q('SELECT * FROM receitas WHERE projeto_id = $1 ORDER BY vencimento, id', [p.id]),
@@ -99,7 +103,16 @@ export default async function ProjetoPage({ params }) {
       <div className="stack">
         <section className="card pad" id="etapas">
           <div className="card-head"><h2>Etapas e prazos</h2><span className="small">Os prazos aparecem na Agenda com a cor do projeto.</span></div>
-          <EtapasEditor projetoId={p.id} salvar={salvarEtapas} inicial={etapas.map((e) => ({ key: e.id, nome: e.nome, inicio: e.inicio || '', prazo: e.prazo || '', status: e.status }))} />
+          {(sobrando.length > 0 || faltando.length > 0) && (
+            <div className="notice" style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}>
+              <span>
+                {sobrando.length > 0 && <>{sobrando.length} etapa{sobrando.length > 1 ? 's estão' : ' está'} desmarcada{sobrando.length > 1 ? 's' : ''} ou sem horas no orçamento ({sobrando.map((e) => e.nome).join(', ')}). </>}
+                {faltando.length > 0 && <>{faltando.length} etapa{faltando.length > 1 ? 's' : ''} do orçamento ainda não {faltando.length > 1 ? 'estão' : 'está'} aqui. </>}
+              </span>
+              <ActionButton action={sincronizar} classe="btn sm primary">Usar só as etapas do orçamento</ActionButton>
+            </div>
+          )}
+          <EtapasEditor key={etapas.map((e) => e.id).join('-')} projetoId={p.id} salvar={salvarEtapas} inicial={etapas.map((e) => ({ key: e.id, nome: e.nome, inicio: e.inicio || '', prazo: e.prazo || '', status: e.status }))} />
         </section>
 
         <div className="grid2">

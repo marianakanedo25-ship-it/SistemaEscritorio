@@ -61,7 +61,8 @@ export async function criarProjetoDoOrcamento(id) {
   const nome = o.nome || 'Novo projeto';
   const p = await one(`INSERT INTO projetos (cliente_id, nome, tipo, area, valor, status, inicio) VALUES ($1,$2,$3,$4,$5,'andamento',$6) RETURNING id`,
     [o.cliente_id, nome, o.tipo, o.area, o.valor, hoje()]);
-  const etapas = (o.dados?.etapas || []).filter((e) => e.on !== false && e.nome);
+  // Só as etapas marcadas na calculadora e com horas calculadas.
+  const etapas = (o.dados?.etapas || []).filter((e) => e.on !== false && e.nome && Number(e.horas) > 0);
   for (let i = 0; i < etapas.length; i++) {
     await q('INSERT INTO etapas (projeto_id, ordem, nome) VALUES ($1,$2,$3)', [p.id, i, etapas[i].nome]);
   }

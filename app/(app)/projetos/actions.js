@@ -127,3 +127,32 @@ export async function gerarParcelas(fd) {
   refresh(projetoId);
   revalidatePath('/financeiro');
 }
+
+/** Etapas do orçamento ligado ao projeto que valem para o projeto: marcadas e com horas. */
+export async function etapasDoOrcamento(projetoId) {
+  await exigir('projetos');
+  const o = await one('SELECT dados FROM orcamentos WHERE projeto_id = $1 ORDER BY id DESC LIMIT 1', [projetoId]);
+  if (!o) return null;
+  const todas = (o.dados?.etapas || []).filter((e) => e.nome);
+  return {
+    validas: todas.filter((e) => e.on !== false && Number(e.horas) > 0).map((e) => e.nome),
+    todas: todas.map((e) => e.nome),
+  };
+}
+
+/**
+ * Deixa no projeto só as etapas marcadas (com horas) no orçamento.
+ * Mantém datas e situação das que ficam; etapas criadas à mão, que não existem no orçamento, continuam no fim.
+ */
+export async function sincronizarEtapasComOrcamento(projetoId) {
+  await exigir('projetos');
+  const orc = await etapasDoOrcamento(projetoId);
+  if (!orc) return;
+  const atuais = await q('SELECT nome, inicio, prazo, status FROM etapas WHERE projeto_id = $1 ORDER BY ordem, id', [projetoId]);
+  const porNome = new Map(atuais.map((e) => [e.nome, e]));
+  const doOrc = orc.validas.map((n) => porNome.get(n) || { nome: n, status: 'pendente' });
+  const manuais = atuais.filter((e) => !orc.todas.includes(e.nome));
+  await q('DELETE FROM etapas WHERE projeto_id = $1', [projetoId]);
+  await inserirEtapas(projetoId, [...doOrc, ...manuais]);
+  refresh(projetoId);
+}
