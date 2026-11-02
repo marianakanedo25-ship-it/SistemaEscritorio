@@ -96,7 +96,7 @@ export default function PropostaEditor({ id, inicial, padrao, jaSalva, valorOrca
           </div>
 
           <label className="fld"><span>Entrega</span><textarea rows={2} value={p.entrega} onChange={(e) => set({ entrega: e.target.value })} /></label>
-          <label className="fld"><span>Prazo</span><textarea rows={3} value={p.prazo} onChange={(e) => set({ prazo: e.target.value })} /></label>
+          <label className="fld"><span>Prazo (opcional; se ficar vazio, não aparece na proposta)</span><textarea rows={3} value={p.prazo} onChange={(e) => set({ prazo: e.target.value })} placeholder="Ex.: 60 dias a partir da assinatura do contrato e do envio das informações do imóvel." /></label>
           <div className="form">
             <label className="fld"><span>Investimento (R$)</span><input type="number" step="0.01" min="0" value={p.valor} onChange={(e) => set({ valor: e.target.value })} /></label>
             <div className="fld"><span>Valor do orçamento</span>
