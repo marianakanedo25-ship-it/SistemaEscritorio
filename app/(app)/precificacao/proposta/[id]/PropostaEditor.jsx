@@ -5,7 +5,7 @@ import { brl, dataExtenso, porExtenso } from '@/lib/format';
 let seq = 0;
 const comChave = (lista) => lista.map((e) => ({ ...e, key: 'p' + (++seq) }));
 
-export default function PropostaEditor({ id, inicial, padrao, jaSalva, valorOrcamento, escritorio, salvar }) {
+export default function PropostaEditor({ id, inicial, padrao, jaSalva, valorOrcamento, escritorio, salvar, marcadas = [], doOrcamento = [], descricoes = {} }) {
   const [p, setP] = useState(() => ({ ...inicial, etapas: comChave(inicial.etapas || []) }));
   const [sujo, setSujo] = useState(!jaSalva);
   const [msg, setMsg] = useState('');
@@ -27,6 +27,21 @@ export default function PropostaEditor({ id, inicial, padrao, jaSalva, valorOrca
       window.print();
       setTimeout(() => { document.title = antes; }, 500);
     });
+  }
+
+  // Etapas da proposta que foram desmarcadas (ou zeradas) na calculadora, e marcadas que faltam aqui.
+  const nomes = p.etapas.map((e) => e.nome);
+  const sobrando = p.etapas.filter((e) => doOrcamento.includes(e.nome) && !marcadas.includes(e.nome));
+  const faltando = marcadas.filter((n) => !nomes.includes(n));
+  function usarMarcadas() {
+    setP((x) => {
+      const porNome = new Map(x.etapas.map((e) => [e.nome, e]));
+      const doOrc = marcadas.map((n) => porNome.get(n) || { key: 'p' + (++seq), nome: n, descricao: descricoes[n] || '' });
+      const manuais = x.etapas.filter((e) => !doOrcamento.includes(e.nome));
+      return { ...x, etapas: [...doOrc, ...manuais] };
+    });
+    setSujo(true);
+    flash('Etapas atualizadas com a calculadora');
   }
 
   const valor = Number(p.valor) || 0;
@@ -55,6 +70,15 @@ export default function PropostaEditor({ id, inicial, padrao, jaSalva, valorOrca
 
           <div className="fld">
             <span>Escopo dos serviços (etapas marcadas na calculadora)</span>
+            {(sobrando.length > 0 || faltando.length > 0) && (
+              <div className="notice" style={{ margin: '0 0 6px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <span>
+                  {sobrando.length > 0 && <>{sobrando.length === 1 ? 'Esta etapa não está marcada' : 'Estas etapas não estão marcadas'} na calculadora: {sobrando.map((e) => e.nome).join(', ')}. </>}
+                  {faltando.length > 0 && <>{faltando.length === 1 ? 'Falta 1 etapa marcada' : `Faltam ${faltando.length} etapas marcadas`} na calculadora. </>}
+                </span>
+                <button type="button" className="btn sm primary" style={{ alignSelf: 'flex-start' }} onClick={usarMarcadas}>Usar só as etapas marcadas</button>
+              </div>
+            )}
             <div className="stack" style={{ gap: 10 }}>
               {p.etapas.map((e, i) => (
                 <div key={e.key} className="prop-et">

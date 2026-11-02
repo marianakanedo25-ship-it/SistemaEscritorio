@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { one, getConfig } from '@/lib/db';
 import { exigir } from '@/lib/auth';
 import { CONFIG_PADRAO } from '@/lib/precificacao';
-import { propostaPadrao } from '@/lib/proposta';
+import { propostaPadrao, etapasMarcadas, etapasDoOrcamento, DESCRICOES_ETAPAS } from '@/lib/proposta';
 import PropostaEditor from './PropostaEditor';
 import { salvarProposta } from '../../actions';
 
@@ -24,6 +24,9 @@ export default async function PropostaPage({ params }) {
         id={o.id}
         inicial={salva || padrao}
         padrao={padrao}
+        marcadas={etapasMarcadas(o)}
+        doOrcamento={etapasDoOrcamento(o)}
+        descricoes={DESCRICOES_ETAPAS}
         jaSalva={!!salva}
         valorOrcamento={Number(o.valor) || 0}
         escritorio={{ nome: esc.nome || 'Mariana Canedo Arquitetura e Interiores', telefone: esc.telefone || '', email: esc.email || '', cau: esc.cau || '', cidade: esc.cidade || '', endereco: esc.endereco || '' }}
