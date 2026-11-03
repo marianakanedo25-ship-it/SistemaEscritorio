@@ -90,3 +90,17 @@ export async function alternarPagoLeitura(id) {
   const r = await one(`UPDATE kit_leituras SET pago_em = CASE WHEN pago_em IS NULL THEN $2 ELSE NULL END WHERE id = $1 RETURNING unidade_id`, [id, hoje()]);
   refresh(r?.unidade_id);
 }
+
+/** Salva de uma vez as próximas leituras digitadas na tabela de energia. */
+export async function salvarLeiturasLote(lista) {
+  await exigir('kitnets');
+  const validas = (Array.isArray(lista) ? lista : []).filter((l) => Number(l.unidade_id) && l.data_atual && l.leitura_atual !== '' && l.leitura_atual != null);
+  for (const l of validas) {
+    await q(`INSERT INTO kit_leituras (unidade_id, data_anterior, leitura_anterior, data_atual, leitura_atual, valor_kwh, franquia_kwh)
+      VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+      [Number(l.unidade_id), l.data_anterior || null, Number(l.leitura_anterior) || 0, l.data_atual, Number(l.leitura_atual),
+        Number(l.valor_kwh) || 0, l.franquia_kwh === '' || l.franquia_kwh == null ? 150 : Number(l.franquia_kwh)]);
+  }
+  refresh();
+  return { salvas: validas.length };
+}
