@@ -38,7 +38,7 @@ export default async function ContratoKitnetPage({ params }) {
         <Link href={`/kitnets?g=${encodeURIComponent(u.grupo)}`}>← Kitnets · {u.grupo}</Link>
         {'  ·  '}<Link href={`/kitnets/${u.id}`}>{nomeUnidade(u)}</Link>
       </p>
-      <ContratoEditor id={u.id} grupo={u.grupo} inicial={inicial} temDadosLocador={!!(salvo.cpf && salvo.rg)} salvar={salvarContratoKitnet} />
+      <ContratoEditor id={u.id} grupo={u.grupo} inicial={inicial} temDadosLocador={!!(salvo.cpf && salvo.endereco)} salvar={salvarContratoKitnet} />
     </>
   );
 }

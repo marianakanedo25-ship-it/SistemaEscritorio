@@ -18,8 +18,8 @@ export default function ContratoEditor({ id, grupo, inicial, temDadosLocador, sa
   const T = d.locatario, L = d.locador, F = d.fiador;
 
   const faltando = [
-    !T.nome && 'nome da parte locatária', !T.rg && 'RG da parte locatária', !T.cpf && 'CPF da parte locatária',
-    !L.rg && 'RG do locador', !L.cpf && 'CPF do locador', !L.endereco && 'endereço do locador', !L.pix && 'chave PIX',
+    !T.nome && 'nome da parte locatária', !T.cpf && 'CPF da parte locatária',
+    !L.cpf && 'CPF do locador', !L.endereco && 'endereço do locador', !L.pix && 'chave PIX',
     !isoOk(d.inicio) && 'início', !isoOk(d.fim) && 'fim', !Number(d.aluguel) && 'valor do aluguel', !Number(d.vencimentoDia) && 'dia do vencimento',
     d.usarFiador && !F.nome && 'nome do fiador',
   ].filter(Boolean);
@@ -82,7 +82,7 @@ export default function ContratoEditor({ id, grupo, inicial, temDadosLocador, sa
             <div className="form">
               {campo('Nome completo', T.nome, (v) => setIn('locatario', { nome: v }), { full: true })}
               {campo('Nacionalidade, profissão e estado civil', T.qualificacao, (v) => setIn('locatario', { qualificacao: v }), { full: true, placeholder: 'brasileira, médica, solteira' })}
-              {campo('RG (com órgão)', T.rg, (v) => setIn('locatario', { rg: v }), { placeholder: '0000000 SSP/GO' })}
+              {campo('RG (opcional)', T.rg, (v) => setIn('locatario', { rg: v }), { placeholder: '0000000 SSP/GO' })}
               {campo('CPF', T.cpf, (v) => setIn('locatario', { cpf: v }), { placeholder: '000.000.000-00' })}
               {campo('Residente em', T.residencia, (v) => setIn('locatario', { residencia: v }), { full: true })}
             </div>
@@ -116,7 +116,7 @@ export default function ContratoEditor({ id, grupo, inicial, temDadosLocador, sa
               <div className="form" style={{ marginTop: 8 }}>
                 {campo('Nome do fiador', F.nome, (v) => setIn('fiador', { nome: v }), { full: true })}
                 {campo('Nacionalidade, profissão e estado civil', F.qualificacao, (v) => setIn('fiador', { qualificacao: v }), { full: true })}
-                {campo('RG', F.rg, (v) => setIn('fiador', { rg: v }))}
+                {campo('RG (opcional)', F.rg, (v) => setIn('fiador', { rg: v }))}
                 {campo('CPF', F.cpf, (v) => setIn('fiador', { cpf: v }))}
                 {campo('Endereço', F.endereco, (v) => setIn('fiador', { endereco: v }), { full: true })}
               </div>
@@ -135,7 +135,7 @@ export default function ContratoEditor({ id, grupo, inicial, temDadosLocador, sa
             <div className="form" style={{ marginTop: 10 }}>
               {campo('Nome', L.nome, (v) => setIn('locador', { nome: v }), { full: true })}
               {campo('Nacionalidade e estado civil', L.qualificacao, (v) => setIn('locador', { qualificacao: v }), { full: true })}
-              {campo('RG (com órgão)', L.rg, (v) => setIn('locador', { rg: v }))}
+              {campo('RG (opcional)', L.rg, (v) => setIn('locador', { rg: v }))}
               {campo('CPF', L.cpf, (v) => setIn('locador', { cpf: v }))}
               {campo('Endereço (residente e domiciliado na…)', L.endereco, (v) => setIn('locador', { endereco: v }), { full: true, placeholder: 'Rua…, nº, bairro, Silvânia Go CEP 75180-000' })}
               {campo('Chave PIX', L.pix, (v) => setIn('locador', { pix: v }))}
