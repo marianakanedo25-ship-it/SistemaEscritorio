@@ -22,7 +22,7 @@ export default function EnergiaTabela({ unidades, salvarLote, salvarLeitura, exc
       leitura_anterior: ult?.leitura_atual ?? '',
       data_atual: hoje(),
       leitura_atual: '',
-      valor_kwh: ult?.valor_kwh ?? u.valor_kwh ?? 0.9,
+      valor_kwh: u.valor_kwh ?? ult?.valor_kwh ?? 0.966, // valor atual cadastrado na kitnet
       franquia_kwh: u.franquia_kwh ?? 150,
     };
   };

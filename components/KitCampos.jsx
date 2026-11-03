@@ -20,7 +20,7 @@ export function UnidadeCampos({ u = {}, grupos = [] }) {
       <label className="fld"><span>Início do contrato</span><input name="inicio" type="date" defaultValue={u.inicio || ''} /></label>
       <label className="fld"><span>Fim do contrato</span><input name="fim" type="date" defaultValue={u.fim || ''} /></label>
       <label className="fld"><span>Energia inclusa no aluguel (kWh)</span><input name="franquia_kwh" type="number" step="1" min="0" defaultValue={u.franquia_kwh ?? 150} /></label>
-      <label className="fld"><span>Valor do kWh (R$)</span><input name="valor_kwh" type="number" step="0.001" min="0" defaultValue={u.valor_kwh ?? 0.9} /></label>
+      <label className="fld"><span>Valor do kWh (R$)</span><input name="valor_kwh" type="number" step="0.001" min="0" defaultValue={u.valor_kwh ?? 0.966} /></label>
       <label className="fld"><span>Locador no contrato</span><input name="locador" defaultValue={u.locador || ''} /></label>
       <label className="fld"><span>Unidade consumidora de água</span><input name="uc_agua" defaultValue={u.uc_agua || ''} /></label>
       <label className="fld full"><span>Pasta no Drive (link)</span><input name="pasta_drive" type="url" defaultValue={u.pasta_drive || ''} /></label>
@@ -35,7 +35,7 @@ export function LeituraCampos({ l = {}, unidade, sugestao = {} }) {
     leitura_anterior: l.leitura_anterior ?? sugestao.leitura_anterior ?? '',
     data_atual: l.data_atual ?? hoje(),
     leitura_atual: l.leitura_atual ?? '',
-    valor_kwh: l.valor_kwh ?? unidade.valor_kwh ?? 0.9,
+    valor_kwh: l.valor_kwh ?? unidade.valor_kwh ?? 0.966,
     franquia_kwh: l.franquia_kwh ?? unidade.franquia_kwh ?? 150,
   });
   const set = (k) => (e) => setV((x) => ({ ...x, [k]: e.target.value }));

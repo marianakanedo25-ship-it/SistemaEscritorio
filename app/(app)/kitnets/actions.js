@@ -40,7 +40,7 @@ export async function salvarUnidade(fd) {
   if (!grupo) return { erro: 'Informe o endereço/grupo da kitnet.' };
   const vals = [grupo, Number(fd.get('numero')) || 1, txt(fd, 'endereco'), txt(fd, 'locador'), txt(fd, 'inquilino'), txt(fd, 'telefone'),
     num(fd, 'aluguel') || 0, Number(fd.get('vencimento_dia')) || null, txt(fd, 'inicio'), txt(fd, 'fim'),
-    num(fd, 'franquia_kwh') ?? 150, num(fd, 'valor_kwh') ?? 0.9, txt(fd, 'uc_agua'), txt(fd, 'pasta_drive'), txt(fd, 'obs')];
+    num(fd, 'franquia_kwh') ?? 150, num(fd, 'valor_kwh') ?? 0.966, txt(fd, 'uc_agua'), txt(fd, 'pasta_drive'), txt(fd, 'obs')];
   if (id) {
     await q(`UPDATE kit_unidades SET grupo=$2, numero=$3, endereco=$4, locador=$5, inquilino=$6, telefone=$7, aluguel=$8, vencimento_dia=$9,
       inicio=$10, fim=$11, franquia_kwh=$12, valor_kwh=$13, uc_agua=$14, pasta_drive=$15, obs=$16 WHERE id=$1`, [id, ...vals]);
