@@ -101,7 +101,7 @@ export default async function KitnetsPage({ searchParams }) {
         <p className="sub" style={{ marginTop: 2 }}>As 4 últimas leituras de cada kitnet e a linha para digitar a próxima. Cobra-se só o que passar da energia inclusa no aluguel.</p>
       </div>
       <EnergiaTabela
-        key={grupo}
+        key={grupo + ':' + unidades.map((u) => { const l = ultimaDe[u.id]; return l ? `${l.id}-${l.data_atual}-${l.leitura_atual}-${l.valor_kwh}` : ''; }).join('|')}
         unidades={unidades.map((u) => ({ id: u.id, numero: u.numero, grupo: u.grupo, inquilino: u.inquilino, aluguel: u.aluguel, franquia_kwh: u.franquia_kwh, valor_kwh: u.valor_kwh, historico: (historicoDe[u.id] || []).map(({ criado_em, n, ...l }) => l) }))}
         salvarLote={salvarLeiturasLote}
         salvarLeitura={salvarLeitura}
