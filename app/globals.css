@@ -336,3 +336,4 @@ button.tag:hover { filter: brightness(.96); }
   .folha-pag > thead { display: table-header-group; }
   .folha-pag > tfoot { display: table-footer-group; }
 }
+.tbl tfoot td { padding: 13px 18px; border-top: 2px solid var(--line-2); background: var(--surface-2); }
