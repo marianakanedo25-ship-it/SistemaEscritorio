@@ -361,3 +361,34 @@ button.tag:hover { filter: brightness(.96); }
 /* Leitura que passou da energia inclusa no aluguel */
 .tbl tr.linha-excede > td { background: var(--warn-soft); }
 .tbl tr.linha-excede > td:first-child { box-shadow: inset 3px 0 0 var(--warn); }
+
+/* ---------- financeiro pessoal ---------- */
+.pf-resumo { margin-bottom: 18px; }
+.pf-eq { display: flex; align-items: stretch; gap: 10px; flex-wrap: wrap; }
+.pf-termo { display: flex; flex-direction: column; gap: 2px; min-width: 130px; flex: 1 1 130px; }
+.pf-termo .lbl { color: var(--muted); font-size: 13.5px; }
+.pf-termo .hint { color: var(--muted); font-size: 12.5px; }
+.pf-val { font-family: var(--f-display); font-size: 26px; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; text-align: left; }
+.pf-op { align-self: center; font-size: 22px; color: var(--sand); padding: 0 2px; }
+.pf-sobra { background: var(--primary-soft); border-radius: 10px; padding: 8px 12px; }
+.pf-link { background: none; border: 0; padding: 0; cursor: pointer; color: inherit; font: inherit; text-decoration: underline dotted; text-underline-offset: 4px; }
+.pf-termo .pf-link.pf-val { font-family: var(--f-display); font-size: 26px; font-weight: 600; }
+.pf-saldo-inp { font-size: 20px; padding: 4px 8px; border: 1px solid var(--line-2); border-radius: 6px; width: 100%; max-width: 180px; }
+.pf-agora { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; }
+.pf-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 1150px) { .pf-grid { grid-template-columns: minmax(0, 1fr); } .pf-op { display: none; } }
+.pf-bloco { display: flex; flex-direction: column; min-width: 0; border-top: 3px solid var(--sand); }
+.pf-entrada { border-top-color: var(--ok); }
+.pf-investimento { border-top-color: var(--primary); }
+.pf-head { display: flex; justify-content: space-between; gap: 12px; padding: 14px 16px 10px; }
+.pf-head h2 { margin: 0; font-size: 18px; }
+.pf-head .r { display: flex; flex-direction: column; align-items: flex-end; }
+.pf-tbl td { padding: 2px 6px; }
+.pf-tbl th { padding: 8px 6px; }
+.pf-tbl input:hover { border-color: var(--line) !important; }
+.pf-tbl input:focus { border-color: var(--primary) !important; background: var(--surface) !important; outline: none; }
+.pf-tbl input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--primary); cursor: pointer; }
+.pf-tbl tr.pf-feito td { background: var(--surface-2); }
+.pf-tbl tr.pf-feito input:not([type=checkbox]) { color: var(--muted); }
+.pf-add { padding: 8px 10px 12px; }
+@media (max-width: 600px) { .pf-tbl th:nth-child(5), .pf-tbl td:nth-child(5) { display: none; } .pf-tbl th:nth-child(3) { width: 92px !important; } }
