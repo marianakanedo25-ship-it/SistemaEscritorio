@@ -73,7 +73,10 @@ export default async function KitnetsPage({ searchParams }) {
         <div className="card stat"><span className="lbl">Contratos</span><span className={'val ' + (alerta.length ? 'neg' : '')}>{alerta.length ? alerta.length + ' atenção' : 'Em dia'}</span><span className="hint">{alerta.length ? alerta.map((u) => nomeUnidade(u)).join(', ') : 'Nenhum vencido ou vencendo em 60 dias'}</span></div>
       </div>
 
-      <h2 style={{ margin: '8px 0 12px' }}>Unidades e contratos · {grupo}</h2>
+      <div style={{ margin: '8px 0 12px' }}>
+        <h2>Unidades e contratos · {grupo}</h2>
+        <p className="sub" style={{ marginTop: 2 }}>Em “Contrato”, o modelo já está pronto: preencha os dados do inquilino e gere o PDF.</p>
+      </div>
       <div className="card table-wrap" style={{ marginBottom: 28 }}>
         <table className="tbl">
           <thead><tr><th>Unidade</th><th>Inquilino</th><th className="r">Aluguel</th><th>Vencimento</th><th>Início</th><th>Fim do contrato</th><th></th></tr></thead>
@@ -88,7 +91,7 @@ export default async function KitnetsPage({ searchParams }) {
                     <td className="num">{u.vencimento_dia ? `Dia ${String(u.vencimento_dia).padStart(2, '0')}` : '—'}</td>
                     <td className="num">{data(u.inicio)}</td>
                     <td><span className={'tag ' + sc.tom}>{sc.texto}</span></td>
-                    <td className="r"><Link className="btn sm" href={`/kitnets/${u.id}`}>Abrir</Link></td>
+                    <td className="r" style={{ whiteSpace: 'nowrap' }}><Link className="btn sm" href={`/kitnets/${u.id}/contrato`}>Contrato</Link> <Link className="btn sm" href={`/kitnets/${u.id}`}>Abrir</Link></td>
                   </tr>
                 );
               })}

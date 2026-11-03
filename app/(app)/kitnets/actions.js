@@ -1,7 +1,7 @@
 'use server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { q, one } from '@/lib/db';
+import { q, one, getConfig, setConfig } from '@/lib/db';
 import { exigir } from '@/lib/auth';
 import { hoje } from '@/lib/format';
 import { KITNETS_INICIAIS } from '@/lib/kitnets-dados';
@@ -103,4 +103,33 @@ export async function salvarLeiturasLote(lista) {
   }
   refresh();
   return { salvas: validas.length };
+}
+
+/**
+ * Salva os dados do contrato: atualiza a kitnet (inquilino, valores, vigência) e os dados do locador do bairro.
+ * Os dados do locador ficam no banco (config), nunca no código.
+ */
+export async function salvarContratoKitnet(id, d) {
+  await exigir('kitnets');
+  const u = await one('SELECT id, grupo FROM kit_unidades WHERE id = $1', [Number(id) || 0]);
+  if (!u) return { erro: 'Kitnet não encontrada.' };
+  const s = (v) => { const t = String(v ?? '').trim(); return t || null; };
+  const n = (v) => { const t = String(v ?? '').trim().replace(',', '.'); return t === '' ? null : Number(t); };
+  const T = d?.locatario || {};
+  const extras = { residencia: s(T.residencia), composicao: s(d?.composicao), antecipado: s(d?.antecipado), usarFiador: !!d?.usarFiador,
+    fiador: d?.fiador || {}, dataAssinatura: s(d?.dataAssinatura), cidade: s(d?.cidade) };
+  await q(`UPDATE kit_unidades SET inquilino=$2, qualificacao=$3, rg=$4, cpf=$5, aluguel=COALESCE($6, aluguel), vencimento_dia=$7,
+    inicio=$8, fim=$9, uc_agua=$10, franquia_kwh=COALESCE($11, franquia_kwh), numero=COALESCE($12, numero), contrato=$13::jsonb WHERE id=$1`,
+    [u.id, s(T.nome), s(T.qualificacao), s(T.rg), s(T.cpf), n(d?.aluguel), Number(d?.vencimentoDia) || null,
+      s(d?.inicio), s(d?.fim), s(d?.ucAgua), n(d?.franquia), Number(d?.kitnet) || null, JSON.stringify(extras)]);
+  if (d?.locador) {
+    const L = d.locador;
+    const todos = (await getConfig('kit_locadores', {})) || {};
+    todos[u.grupo] = { nome: s(L.nome) || '', qualificacao: s(L.qualificacao) || '', rg: s(L.rg) || '', cpf: s(L.cpf) || '', endereco: s(L.endereco) || '',
+      pix: s(L.pix) || '', pixTitular: s(L.pixTitular) || '', imovel: s(L.imovel) || '', composicao: s(L.composicao) || '' };
+    await setConfig('kit_locadores', todos);
+  }
+  refresh(u.id);
+  revalidatePath(`/kitnets/${u.id}/contrato`);
+  return { ok: true };
 }
