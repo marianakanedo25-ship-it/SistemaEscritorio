@@ -358,3 +358,6 @@ button.tag:hover { filter: brightness(.96); }
   body:has(.contrato) { page: contrato; background: #fff !important; }
   .contrato { width: auto; max-width: none; padding: 0; box-shadow: none; }
 }
+/* Leitura que passou da energia inclusa no aluguel */
+.tbl tr.linha-excede > td { background: var(--warn-soft); }
+.tbl tr.linha-excede > td:first-child { box-shadow: inset 3px 0 0 var(--warn); }

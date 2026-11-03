@@ -68,7 +68,7 @@ export default function EnergiaTabela({ unidades, salvarLote, salvarLeitura, exc
                 ...u.historico.map((l) => {
                   const c = calcLeitura(l);
                   return (
-                    <tr key={l.id}>
+                    <tr key={l.id} className={c.excedente > 0 && !c.inconsistente ? 'linha-excede' : undefined} title={c.excedente > 0 ? `Passou ${numero(c.excedente)} kWh do incluso` : undefined}>
                       <td className="num">
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                           <span>{data(l.data_anterior).slice(0, 5)} a {data(l.data_atual)}</span>
@@ -81,7 +81,7 @@ export default function EnergiaTabela({ unidades, salvarLote, salvarLeitura, exc
                       </td>
                       <td className="r num">{numero(l.leitura_anterior)}</td>
                       <td className="r num">{numero(l.leitura_atual)}</td>
-                      <td className={'r num ' + (c.inconsistente ? 'neg' : '')}>{numero(c.consumo)} kWh{c.inconsistente && <span className="sm neg">conferir leitura</span>}</td>
+                      <td className={'r num ' + (c.inconsistente ? 'neg' : '')}>{numero(c.consumo)} kWh{c.inconsistente ? <span className="sm neg">conferir leitura</span> : c.excedente > 0 && <span className="sm wrn">+{numero(c.excedente)} acima de {numero(c.franquia, 0)}</span>}</td>
                       <td className="r num">{kwh(l.valor_kwh)}</td>
                       <td className="r num" style={{ fontWeight: 500 }}>{brl(c.total)}</td>
                       <td className="r num">{brl(Number(u.aluguel) + c.total)}</td>
@@ -93,7 +93,7 @@ export default function EnergiaTabela({ unidades, salvarLote, salvarLeitura, exc
                     </tr>
                   );
                 }),
-                <tr key={'p' + u.id} style={{ background: temP ? 'var(--primary-soft)' : undefined }}>
+                <tr key={'p' + u.id} className={temP && cp.excedente > 0 && !cp.inconsistente ? 'linha-excede' : undefined} style={{ background: temP && !(cp.excedente > 0 && !cp.inconsistente) ? 'var(--primary-soft)' : undefined }}>
                   <td>
                     <span className="small" style={{ display: 'block', marginBottom: 4 }}>Próxima leitura · de {data(p.data_anterior).slice(0, 5)} a</span>
                     <input type="date" aria-label={`Data da próxima leitura, ${nomeUnidade(u)}`} value={p.data_atual} onChange={(e) => set(u.id, 'data_atual', e.target.value)} style={{ ...inp, textAlign: 'left', maxWidth: 160 }} />

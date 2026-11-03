@@ -101,7 +101,7 @@ export default async function KitnetsPage({ searchParams }) {
 
       <div style={{ marginBottom: 12 }}>
         <h2>Controle de energia</h2>
-        <p className="sub" style={{ marginTop: 2 }}>As 4 últimas leituras de cada kitnet e a linha para digitar a próxima. Cobra-se só o que passar da energia inclusa no aluguel.</p>
+        <p className="sub" style={{ marginTop: 2 }}>As 4 últimas leituras de cada kitnet e a linha para digitar a próxima. Cobra-se só o que passar da energia inclusa no aluguel; as linhas em amarelo passaram do limite.</p>
       </div>
       <EnergiaTabela
         key={grupo + ':' + unidades.map((u) => { const l = ultimaDe[u.id]; return l ? `${l.id}-${l.data_atual}-${l.leitura_atual}-${l.valor_kwh}` : ''; }).join('|')}
