@@ -33,7 +33,7 @@ export default async function KitnetPage({ params }) {
 
   return (
     <>
-      <p className="small" style={{ margin: '0 0 8px' }}><Link href="/kitnets">← Kitnets</Link></p>
+      <p className="small" style={{ margin: '0 0 8px' }}><Link href={`/kitnets?g=${encodeURIComponent(u.grupo)}`}>← Kitnets · {u.grupo}</Link></p>
       <div className="page-head">
         <div><h1>{nomeUnidade(u)} · {u.grupo}</h1><p className="sub">{u.inquilino || 'Sem inquilino'}{u.endereco ? ' · ' + u.endereco : ''}</p></div>
         <div className="actions">

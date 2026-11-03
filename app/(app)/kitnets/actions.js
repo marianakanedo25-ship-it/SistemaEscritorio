@@ -53,9 +53,9 @@ export async function salvarUnidade(fd) {
 
 export async function excluirUnidade(id) {
   await exigir('kitnets');
-  await q('DELETE FROM kit_unidades WHERE id = $1', [id]);
+  const u = await one('DELETE FROM kit_unidades WHERE id = $1 RETURNING grupo', [id]);
   refresh();
-  redirect('/kitnets');
+  redirect('/kitnets' + (u?.grupo ? '?g=' + encodeURIComponent(u.grupo) : ''));
 }
 
 export async function salvarLeitura(fd) {
