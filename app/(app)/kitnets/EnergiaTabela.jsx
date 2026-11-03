@@ -48,10 +48,10 @@ export default function EnergiaTabela({ unidades, salvarLote, salvarLeitura, exc
   return (
     <div className="card">
       <div className="table-wrap">
-        <table className="tbl" style={{ minWidth: 1080 }}>
+        <table className="tbl" style={{ minWidth: 980 }}>
           <thead><tr>
             <th>Período</th><th className="r">Leitura anterior</th><th className="r">Leitura atual</th><th className="r">kWh consumido</th>
-            <th className="r">Valor do kWh</th><th className="r">Energia a cobrar</th><th className="r">Total com aluguel</th><th>Situação</th><th></th>
+            <th className="r">Valor do kWh</th><th className="r">Energia a cobrar</th><th className="r">Total com aluguel</th><th>Situação</th>
           </tr></thead>
           <tbody>
             {unidades.map((u) => {
@@ -60,7 +60,7 @@ export default function EnergiaTabela({ unidades, salvarLote, salvarLeitura, exc
               const temP = p.leitura_atual !== '';
               return [
                 <tr key={'h' + u.id}>
-                  <td colSpan={9} style={{ background: 'var(--surface-2)', paddingTop: 10, paddingBottom: 10 }}>
+                  <td colSpan={8} style={{ background: 'var(--surface-2)', paddingTop: 10, paddingBottom: 10 }}>
                     <Link href={`/kitnets/${u.id}`} style={{ fontWeight: 600, textDecoration: 'none' }}>{nomeUnidade(u)}</Link>
                     <span className="small"> · {u.inquilino || 'Vaga'} · aluguel {brl(u.aluguel)} · {numero(u.franquia_kwh, 0)} kWh inclusos</span>
                   </td>
@@ -69,7 +69,16 @@ export default function EnergiaTabela({ unidades, salvarLote, salvarLeitura, exc
                   const c = calcLeitura(l);
                   return (
                     <tr key={l.id}>
-                      <td className="num">{data(l.data_anterior).slice(0, 5)} a {data(l.data_atual)}{l.obs && <span className="sm">{l.obs}</span>}</td>
+                      <td className="num">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                          <span>{data(l.data_anterior).slice(0, 5)} a {data(l.data_atual)}</span>
+                          <Modal titulo={`Editar leitura · ${nomeUnidade(u)}`} botao="Editar" classe="btn sm" action={salvarLeitura}
+                            extraFoot={<ConfirmButton action={() => excluirLeitura(l.id)} />}>
+                            <LeituraCampos l={l} unidade={u} />
+                          </Modal>
+                        </div>
+                        {l.obs && <span className="sm">{l.obs}</span>}
+                      </td>
                       <td className="r num">{numero(l.leitura_anterior)}</td>
                       <td className="r num">{numero(l.leitura_atual)}</td>
                       <td className={'r num ' + (c.inconsistente ? 'neg' : '')}>{numero(c.consumo)} kWh{c.inconsistente && <span className="sm neg">conferir leitura</span>}</td>
@@ -80,12 +89,6 @@ export default function EnergiaTabela({ unidades, salvarLote, salvarLeitura, exc
                         <button type="button" className={'tag ' + (l.pago_em ? 'ok' : c.total > 0 ? 'warn' : 'mute')} title="Clique para alternar" onClick={() => start(() => alternarPago(l.id))}>
                           {l.pago_em ? `Pago ${data(l.pago_em).slice(0, 5)}` : 'A receber'}
                         </button>
-                      </td>
-                      <td className="r">
-                        <Modal titulo={`Editar leitura · ${nomeUnidade(u)}`} botao="Editar" classe="btn sm" action={salvarLeitura}
-                          extraFoot={<ConfirmButton action={() => excluirLeitura(l.id)} />}>
-                          <LeituraCampos l={l} unidade={u} />
-                        </Modal>
                       </td>
                     </tr>
                   );
@@ -101,7 +104,7 @@ export default function EnergiaTabela({ unidades, salvarLote, salvarLeitura, exc
                   <td className="r"><input type="number" step="0.001" min="0" aria-label={`Valor do kWh, ${nomeUnidade(u)}`} value={p.valor_kwh} onChange={(e) => set(u.id, 'valor_kwh', e.target.value)} style={{ ...inp, maxWidth: 100 }} /></td>
                   <td className="r num" style={{ fontWeight: 500 }}>{temP ? brl(cp.total) : '—'}</td>
                   <td className="r num">{temP ? brl(Number(u.aluguel) + cp.total) : '—'}</td>
-                  <td colSpan={2}><span className="small">{temP ? 'Pronta para salvar' : ''}</span></td>
+                  <td><span className="small">{temP ? 'Pronta para salvar' : ''}</span></td>
                 </tr>,
               ];
             })}
