@@ -75,7 +75,7 @@ export default async function KitnetsPage({ searchParams }) {
 
       <div style={{ margin: '8px 0 12px' }}>
         <h2>Unidades e contratos · {grupo}</h2>
-        <p className="sub" style={{ marginTop: 2 }}>Em “Contrato”, o modelo já está pronto: preencha os dados do inquilino e gere o PDF.</p>
+        <p className="sub" style={{ marginTop: 2 }}>Em “Contrato” e “Vistoria”, os modelos já estão prontos: preencha os dados e gere o PDF.</p>
       </div>
       <div className="card table-wrap" style={{ marginBottom: 28 }}>
         <table className="tbl">
@@ -91,7 +91,7 @@ export default async function KitnetsPage({ searchParams }) {
                     <td className="num">{u.vencimento_dia ? `Dia ${String(u.vencimento_dia).padStart(2, '0')}` : '—'}</td>
                     <td className="num">{data(u.inicio)}</td>
                     <td><span className={'tag ' + sc.tom}>{sc.texto}</span></td>
-                    <td className="r" style={{ whiteSpace: 'nowrap' }}><Link className="btn sm" href={`/kitnets/${u.id}/contrato`}>Contrato</Link> <Link className="btn sm" href={`/kitnets/${u.id}`}>Abrir</Link></td>
+                    <td className="r" style={{ whiteSpace: 'nowrap' }}><Link className="btn sm" href={`/kitnets/${u.id}/contrato`}>Contrato</Link> <Link className="btn sm" href={`/kitnets/${u.id}/vistoria`}>Vistoria</Link> <Link className="btn sm" href={`/kitnets/${u.id}`}>Abrir</Link></td>
                   </tr>
                 );
               })}

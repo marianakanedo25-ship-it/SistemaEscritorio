@@ -38,6 +38,7 @@ export default async function KitnetPage({ params }) {
         <div><h1>{nomeUnidade(u)} · {u.grupo}</h1><p className="sub">{u.inquilino || 'Sem inquilino'}{u.endereco ? ' · ' + u.endereco : ''}</p></div>
         <div className="actions">
           <Link className="btn" href={`/kitnets/${u.id}/contrato`}>Contrato</Link>
+          <Link className="btn" href={`/kitnets/${u.id}/vistoria`}>Termo de vistoria</Link>
           {u.pasta_drive && <a className="btn" href={u.pasta_drive} target="_blank" rel="noreferrer">Pasta no Drive</a>}
           <Modal titulo={`Nova leitura · ${nomeUnidade(u)}`} botao="+ Lançar leitura" classe="btn primary" action={salvarLeitura}><LeituraCampos unidade={u} sugestao={sug} /></Modal>
         </div>

@@ -397,3 +397,20 @@ button.tag:hover { filter: brightness(.96); }
 .ct-data-edit:hover { background: var(--warn-soft); }
 .ct-data-edit input { font: inherit; font-size: 12px; border: 1px solid var(--line-2); border-radius: 6px; padding: 3px 6px; background: #fff; }
 @media print { .ct-data-edit input { display: none !important; } .ct-data-edit:hover { background: none; } }
+
+/* ---------- termo de vistoria ---------- */
+.vt-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.vt-tbl th, .vt-tbl td { text-align: left; padding: 5px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.vt-tbl th { color: var(--muted); font-weight: 500; }
+.vt-ops { display: flex; flex-wrap: wrap; gap: 4px; }
+.vt-op { border: 1px solid var(--line-2); background: var(--surface); border-radius: 999px; padding: 2px 8px; font: inherit; font-size: 12px; cursor: pointer; color: var(--muted); }
+.vt-op.on { background: var(--primary); border-color: var(--primary); color: #fff; }
+.vistoria h3 { font-family: var(--f-body); font-size: 12.5px; font-weight: 700; margin: 12px 0 4px; }
+.vt-dados { border-collapse: collapse; margin-bottom: 8px; text-align: left; }
+.vt-dados th { font-weight: 700; padding: 2px 14px 2px 0; white-space: nowrap; vertical-align: top; }
+.vt-dados td { padding: 2px 0; }
+.vt-cond { width: 100%; border-collapse: collapse; margin: 4px 0 8px; font-size: 11.5px; text-align: left; break-inside: avoid; }
+.vt-cond th, .vt-cond td { border: 1px solid #bbb; padding: 4px 6px; }
+.vt-cond th { background: #f2f2f2; }
+.vt-m { white-space: nowrap; margin-right: 10px; }
+.vt-amb { break-inside: avoid; }

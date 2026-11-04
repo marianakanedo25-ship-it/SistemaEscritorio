@@ -38,6 +38,7 @@ export default async function ContratoKitnetPage({ params }) {
       <p className="small no-print" style={{ margin: '0 0 8px' }}>
         <Link href={`/kitnets?g=${encodeURIComponent(u.grupo)}`}>← Kitnets · {u.grupo}</Link>
         {'  ·  '}<Link href={`/kitnets/${u.id}`}>{nomeUnidade(u)}</Link>
+        {'  ·  '}<Link href={`/kitnets/${u.id}/vistoria`}>Termo de vistoria</Link>
       </p>
       <ContratoEditor id={u.id} grupo={u.grupo} inicial={inicial} temDadosLocador={!!(salvo.cpf && salvo.endereco)} salvar={salvarContratoKitnet} />
     </>

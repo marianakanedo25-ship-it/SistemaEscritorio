@@ -134,3 +134,20 @@ export async function salvarContratoKitnet(id, d) {
   revalidatePath(`/kitnets/${u.id}/contrato`);
   return { ok: true };
 }
+
+/** Salva o termo de vistoria da kitnet (o último preenchido). */
+export async function salvarVistoriaKitnet(id, v) {
+  await exigir('kitnets');
+  const u = await one('SELECT id FROM kit_unidades WHERE id = $1', [Number(id) || 0]);
+  if (!u) return { erro: 'Kitnet não encontrada.' };
+  const limpo = {
+    tipo: v?.tipo === 'saida' ? 'saida' : 'entrada',
+    data: String(v?.data || ''), dataAssinatura: String(v?.dataAssinatura || ''), cidade: String(v?.cidade || ''),
+    endereco: String(v?.endereco || ''),
+    condicoes: v?.condicoes && typeof v.condicoes === 'object' ? v.condicoes : {},
+    ambientes: Array.isArray(v?.ambientes) ? v.ambientes.slice(0, 30).map((a) => ({ nome: String(a.nome || ''), itens: String(a.itens || ''), condicoes: String(a.condicoes || ''), obs: String(a.obs || '') })) : [],
+    obsGerais: String(v?.obsGerais || ''), wifi: String(v?.wifi || ''),
+  };
+  await q('UPDATE kit_unidades SET vistoria = $2::jsonb WHERE id = $1', [u.id, JSON.stringify(limpo)]);
+  return { ok: true };
+}
