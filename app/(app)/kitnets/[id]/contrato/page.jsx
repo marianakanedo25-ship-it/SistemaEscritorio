@@ -29,6 +29,7 @@ export default async function ContratoKitnetPage({ params }) {
     ucAgua: u.uc_agua || '', composicao: x.composicao || '', antecipado: x.antecipado || '',
     usarFiador: !!x.usarFiador, fiador: { nome: '', qualificacao: '', rg: '', cpf: '', endereco: '', ...(x.fiador || {}) },
     cidade: x.cidade || 'Silvânia', dataAssinatura: x.dataAssinatura || u.inicio || hoje(),
+    primeiroPagamento: x.primeiroPagamento || '', ultimoPagamento: x.ultimoPagamento || '',
     locador,
   };
 

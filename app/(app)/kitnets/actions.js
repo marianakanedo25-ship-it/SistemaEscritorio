@@ -117,7 +117,8 @@ export async function salvarContratoKitnet(id, d) {
   const n = (v) => { const t = String(v ?? '').trim().replace(',', '.'); return t === '' ? null : Number(t); };
   const T = d?.locatario || {};
   const extras = { residencia: s(T.residencia), composicao: s(d?.composicao), antecipado: s(d?.antecipado), usarFiador: !!d?.usarFiador,
-    fiador: d?.fiador || {}, dataAssinatura: s(d?.dataAssinatura), cidade: s(d?.cidade) };
+    fiador: d?.fiador || {}, dataAssinatura: s(d?.dataAssinatura), cidade: s(d?.cidade),
+    primeiroPagamento: s(d?.primeiroPagamento), ultimoPagamento: s(d?.ultimoPagamento) };
   await q(`UPDATE kit_unidades SET inquilino=$2, qualificacao=$3, rg=$4, cpf=$5, aluguel=COALESCE($6, aluguel), vencimento_dia=$7,
     inicio=$8, fim=$9, uc_agua=$10, franquia_kwh=COALESCE($11, franquia_kwh), numero=COALESCE($12, numero), contrato=$13::jsonb WHERE id=$1`,
     [u.id, s(T.nome), s(T.qualificacao), s(T.rg), s(T.cpf), n(d?.aluguel), Number(d?.vencimentoDia) || null,

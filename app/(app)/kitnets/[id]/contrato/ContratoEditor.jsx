@@ -42,7 +42,7 @@ export default function ContratoEditor({ id, grupo, inicial, temDadosLocador, sa
   function renovar() {
     if (!isoOk(d.fim)) return flash('Preencha o fim do contrato atual primeiro.');
     const ini = umDia(d.fim, 1);
-    set({ inicio: ini, fim: umDia(addMeses(ini, 12), -1), dataAssinatura: ini, antecipado: '' });
+    set({ inicio: ini, fim: umDia(addMeses(ini, 12), -1), dataAssinatura: ini, antecipado: '', primeiroPagamento: '', ultimoPagamento: '' });
     flash('Datas da renovação preenchidas: confira o valor do aluguel');
   }
   function novoInquilino() {
@@ -97,14 +97,20 @@ export default function ContratoEditor({ id, grupo, inicial, temDadosLocador, sa
 
           <fieldset className="kc-grupo"><legend>Locação</legend>
             <div className="form">
-              {campo('Início', d.inicio, (v) => set({ inicio: v }), { type: 'date' })}
+              {campo('Início', d.inicio, (v) => set({ inicio: v, ...(isoOk(v) ? { vencimentoDia: Number(v.slice(8, 10)) } : {}) }), { type: 'date' })}
               {campo('Fim', d.fim, (v) => set({ fim: v }), { type: 'date' })}
               {campo('Aluguel (R$)', d.aluguel, (v) => set({ aluguel: v }), { type: 'number', step: '0.01', min: '0' })}
               {campo('Dia do vencimento', d.vencimentoDia, (v) => set({ vencimentoDia: v }), { type: 'number', min: '1', max: '31' })}
               {campo('Energia inclusa (kWh)', d.franquia, (v) => set({ franquia: v }), { type: 'number', min: '0' })}
               {campo('Nº da kitnet', d.kitnet, (v) => set({ kitnet: v }), { type: 'number', min: '1' })}
             </div>
-            <p className="small" style={{ margin: '8px 0 0' }}>{resumo.meses} meses · 1º pagamento {BR(resumo.primeiro)} · último {BR(resumo.ultimo)} · aviso de saída até {BR(resumo.aviso)}</p>
+            <div className="form" style={{ marginTop: 10 }}>
+              <label className="fld"><span>1º pagamento {d.primeiroPagamento ? <button type="button" className="pf-link small" onClick={() => set({ primeiroPagamento: '' })}>(usar automático)</button> : <span className="small">(automático: início)</span>}</span>
+                <input type="date" value={d.primeiroPagamento || resumo.primeiro || ''} onChange={(e) => set({ primeiroPagamento: e.target.value })} /></label>
+              <label className="fld"><span>Último pagamento {d.ultimoPagamento ? <button type="button" className="pf-link small" onClick={() => set({ ultimoPagamento: '' })}>(usar automático)</button> : <span className="small">(automático)</span>}</span>
+                <input type="date" value={d.ultimoPagamento || resumo.ultimo || ''} onChange={(e) => set({ ultimoPagamento: e.target.value })} /></label>
+            </div>
+            <p className="small" style={{ margin: '8px 0 0' }}>{resumo.meses} meses · aviso de saída até {BR(resumo.aviso)}. Ao mudar o início, o dia do vencimento acompanha; ajuste se for outro.</p>
             {campo('Pagamento antecipado (opcional; vira um parágrafo da cláusula do aluguel)', d.antecipado, (v) => set({ antecipado: v }), { area: true, full: true, placeholder: 'Ex.: A parte Locatária efetuou o pagamento antecipado de R$ 4.950,00 em 23/06/2026, correspondente aos aluguéis de julho, agosto e setembro de 2026…' })}
           </fieldset>
 
