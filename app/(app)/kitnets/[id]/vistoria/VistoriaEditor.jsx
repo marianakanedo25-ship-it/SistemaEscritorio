@@ -131,7 +131,7 @@ export default function VistoriaEditor({ id, grupo, kitnet, partes, inicial, pad
               ))}
               <div className="actions">
                 <button type="button" className="btn sm" onClick={() => set({ ambientes: [...v.ambientes, { nome: 'Novo ambiente', itens: '', condicoes: '', obs: '' }] })}>Adicionar ambiente</button>
-                <button type="button" className="btn ghost sm" onClick={() => { set({ ambientes: padraoAmbientes.map((a) => ({ ...a })) }); flash('Ambientes do modelo restaurados'); }}>Restaurar ambientes do modelo</button>
+                <button type="button" className="btn ghost sm" onClick={() => { set({ ambientes: padraoAmbientes.map((a) => ({ ...a })) }); flash('Ambientes do termo original restaurados'); }}>Restaurar ambientes do termo original</button>
               </div>
             </div>
           </fieldset>

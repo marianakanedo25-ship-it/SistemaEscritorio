@@ -6,6 +6,7 @@ import { hoje } from '@/lib/format';
 import { nomeUnidade } from '@/lib/kitnets';
 import { locadorPadrao } from '@/lib/contrato-kitnet';
 import { vistoriaPadrao } from '@/lib/vistoria-kitnet';
+import { vistoriaDoDrive } from '@/lib/vistoria-dados';
 import VistoriaEditor from './VistoriaEditor';
 import { salvarVistoriaKitnet } from '../../actions';
 
@@ -21,7 +22,10 @@ export default async function VistoriaPage({ params }) {
   const base = vistoriaPadrao(u.grupo, hoje());
   const salvo = u.vistoria || {};
   const enderecoPadrao = String(L.imovel || '').split(/,\s*Kitnet/i)[0] + (u.grupo === 'Centro' ? ' – Centro' : ' – Nossa Senhora de Fátima');
-  const inicial = { ...base, endereco: enderecoPadrao, ...salvo, condicoes: { ...base.condicoes, ...(salvo.condicoes || {}) } };
+  // Ordem: modelo do bairro → termo que estava no Drive para esta kitnet → o que você já salvou aqui
+  const drive = vistoriaDoDrive(u.grupo, u.numero) || {};
+  const { mobiliada, ...doDrive } = drive;
+  const inicial = { ...base, endereco: enderecoPadrao, ...doDrive, ...salvo, condicoes: { ...base.condicoes, ...(salvo.condicoes || {}) } };
 
   return (
     <>
@@ -36,7 +40,7 @@ export default async function VistoriaPage({ params }) {
         kitnet={u.numero}
         partes={{ locador: L.nome || '', locadorCpf: L.cpf || '', locatario: u.inquilino || '', locatarioCpf: u.cpf || '' }}
         inicial={inicial}
-        padraoAmbientes={base.ambientes}
+        padraoAmbientes={doDrive.ambientes || base.ambientes}
         salvar={salvarVistoriaKitnet}
       />
     </>
