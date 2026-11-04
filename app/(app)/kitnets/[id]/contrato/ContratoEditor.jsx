@@ -78,6 +78,13 @@ export default function ContratoEditor({ id, grupo, inicial, temDadosLocador, sa
           <p className="small" style={{ margin: 0 }}>Preencha só os dados; o texto do contrato se atualiza ao lado. Em “Gerar PDF”, escolha <strong>Salvar como PDF</strong>. Ao salvar, o inquilino, o aluguel e as datas também são atualizados na aba Kitnets.</p>
           {faltando.length > 0 && <div className="notice" style={{ margin: 0 }}>Faltam: {faltando.join(', ')}. Esses pontos saem como “__________” no contrato.</div>}
 
+          <fieldset className="kc-grupo"><legend>Data e local da assinatura (final do contrato)</legend>
+            <div className="form">
+              {campo('Cidade', d.cidade, (v) => set({ cidade: v }))}
+              {campo('Data', d.dataAssinatura, (v) => set({ dataAssinatura: v }), { type: 'date' })}
+            </div>
+          </fieldset>
+
           <fieldset className="kc-grupo"><legend>Parte locatária</legend>
             <div className="form">
               {campo('Nome completo', T.nome, (v) => setIn('locatario', { nome: v }), { full: true })}
@@ -123,12 +130,6 @@ export default function ContratoEditor({ id, grupo, inicial, temDadosLocador, sa
             )}
           </fieldset>
 
-          <fieldset className="kc-grupo"><legend>Assinatura</legend>
-            <div className="form">
-              {campo('Cidade', d.cidade, (v) => set({ cidade: v }))}
-              {campo('Data', d.dataAssinatura, (v) => set({ dataAssinatura: v }), { type: 'date' })}
-            </div>
-          </fieldset>
 
           <details className="kc-grupo" open={!temDadosLocador}>
             <summary><strong>Locador · {grupo}</strong> <span className="small">(vale para todas as kitnets do bairro)</span></summary>
@@ -152,7 +153,14 @@ export default function ContratoEditor({ id, grupo, inicial, temDadosLocador, sa
           {blocos.map((b, i) => {
             if (b.t === 'titulo') return <h1 key={i}>{b.texto}</h1>;
             if (b.t === 'secao') return <h2 key={i}>{b.texto}</h2>;
-            if (b.t === 'local') return <p key={i} className="ct-local">{b.texto}</p>;
+            if (b.t === 'local') return (
+              <p key={i} className="ct-local">
+                <label className="ct-data-edit" title="Clique para alterar a data">
+                  {b.texto}
+                  <input type="date" value={d.dataAssinatura || ''} onChange={(e) => set({ dataAssinatura: e.target.value })} aria-label="Data da assinatura" className="no-print" />
+                </label>
+              </p>
+            );
             if (b.t === 'ass') return (
               <div key={i} className="ct-ass">
                 {b.partes.map((p, j) => (

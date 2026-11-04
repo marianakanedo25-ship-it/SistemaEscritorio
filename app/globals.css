@@ -392,3 +392,8 @@ button.tag:hover { filter: brightness(.96); }
 .pf-tbl tr.pf-feito input:not([type=checkbox]) { color: var(--muted); }
 .pf-add { padding: 8px 10px 12px; }
 @media (max-width: 600px) { .pf-tbl th:nth-child(5), .pf-tbl td:nth-child(5) { display: none; } .pf-tbl th:nth-child(3) { width: 92px !important; } }
+/* Data no final do contrato: clique para alterar (o campo some na impressão) */
+.ct-data-edit { position: relative; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; border-radius: 4px; padding: 2px 4px; }
+.ct-data-edit:hover { background: var(--warn-soft); }
+.ct-data-edit input { font: inherit; font-size: 12px; border: 1px solid var(--line-2); border-radius: 6px; padding: 3px 6px; background: #fff; }
+@media print { .ct-data-edit input { display: none !important; } .ct-data-edit:hover { background: none; } }
