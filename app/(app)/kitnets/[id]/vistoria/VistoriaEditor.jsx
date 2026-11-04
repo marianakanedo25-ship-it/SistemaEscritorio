@@ -152,7 +152,7 @@ export default function VistoriaEditor({ id, grupo, kitnet, partes, inicial, pad
             <tr><th>Endereço do imóvel</th><td>{v.endereco}</td></tr>
             <tr><th>Imóvel</th><td>Kitnet {String(kitnet).padStart(2, '0')}</td></tr>
             <tr><th>Cidade</th><td>Silvânia – GO</td></tr>
-            <tr><th>Data da vistoria</th><td>{BR(v.data)}</td></tr>
+            <tr><th>Data da vistoria</th><td><label className="ct-data-edit" title="Clique para alterar a data">{BR(v.data)}<input type="date" value={v.data || ''} onChange={(e) => set({ data: e.target.value })} aria-label="Data da vistoria" className="no-print" /></label></td></tr>
             <tr><th>Tipo de vistoria</th><td>{marca(v.tipo === 'entrada')} Entrada &nbsp;&nbsp; {marca(v.tipo === 'saida')} Saída</td></tr>
           </tbody></table>
 
@@ -191,7 +191,12 @@ export default function VistoriaEditor({ id, grupo, kitnet, partes, inicial, pad
           <h2>Declaração</h2>
           <p>{DECLARACAO}</p>
 
-          <p className="ct-local">{v.cidade || 'Silvânia'}, {dataLonga(v.dataAssinatura)}.</p>
+          <p className="ct-local">
+            <label className="ct-data-edit" title="Clique para alterar a data">
+              {v.cidade || 'Silvânia'}, {dataLonga(v.dataAssinatura)}.
+              <input type="date" value={v.dataAssinatura || ''} onChange={(e) => set({ dataAssinatura: e.target.value })} aria-label="Data da assinatura" className="no-print" />
+            </label>
+          </p>
           <div className="ct-ass">
             <div><span className="linha" /><strong>{partes.locador || '__________'} – Locador(a)</strong><br />CPF: {partes.locadorCpf || '__________'}</div>
             <div><span className="linha" /><strong>{partes.locatario || '__________'} – Locatário(a)</strong><br />CPF: {partes.locatarioCpf || '__________'}</div>
