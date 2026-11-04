@@ -109,15 +109,15 @@ export default function PessoalMes({ mes, inicial, saldoAuto, saldoManualInicial
               </header>
               <div className="table-wrap">
                 <table className="tbl pf-tbl">
-                  <thead><tr><th style={{ width: 36 }} title={tp.feito}>✓</th><th>Descrição</th><th className="r" style={{ width: 120 }}>Valor</th><th style={{ width: 74 }}>Parcela</th><th style={{ width: 132 }}>Data</th><th style={{ width: 34 }}></th></tr></thead>
+                  <thead><tr><th>Descrição</th><th className="r" style={{ width: 110 }}>Valor</th><th style={{ width: 64 }}>Parcela</th><th style={{ width: 128 }}>Data</th><th style={{ width: 86 }}>{tp.feito}?</th><th style={{ width: 34 }}></th></tr></thead>
                   <tbody>
                     {ls.map((l) => (
                       <tr key={l.key} className={l.feito ? 'pf-feito' : ''}>
-                        <td><input type="checkbox" checked={!!l.feito} onChange={(e) => setL(l.key, { feito: e.target.checked })} aria-label={`${tp.feito}: ${l.descricao || 'item'}`} /></td>
                         <td><input style={inp} value={l.descricao} placeholder="Descrição" onChange={(e) => setL(l.key, { descricao: e.target.value })} aria-label="Descrição" /></td>
                         <td><input style={{ ...inp, textAlign: 'right' }} type="number" step="0.01" min="0" value={l.valor} placeholder="0,00" onChange={(e) => setL(l.key, { valor: e.target.value })} aria-label="Valor" /></td>
                         <td><input style={inp} value={l.parcela} placeholder="—" onChange={(e) => setL(l.key, { parcela: e.target.value })} aria-label="Parcela (ex.: 3/8)" /></td>
                         <td><input style={inp} type="date" value={l.data} onChange={(e) => setL(l.key, { data: e.target.value })} aria-label="Data" /></td>
+                        <td><button type="button" className={'pf-pago' + (l.feito ? ' on' : '')} aria-pressed={!!l.feito} onClick={() => setL(l.key, { feito: !l.feito })} title="Clique para marcar ou desmarcar">{l.feito ? '✓ Sim' : 'Não'}</button></td>
                         <td className="r"><button type="button" className="btn ghost sm" onClick={() => del(l.key)} aria-label="Remover linha">✕</button></td>
                       </tr>
                     ))}
@@ -130,7 +130,7 @@ export default function PessoalMes({ mes, inicial, saldoAuto, saldoManualInicial
         })}
       </div>
       <p className="small" style={{ marginTop: 14 }}>
-        Marque ✓ quando receber, pagar ou investir. “Vai sobrar” considera tudo o que está lançado; “Na conta agora” só o que está marcado.
+        Na coluna “Pago?” (ou Recebido/Investido), clique para trocar entre Não e Sim; a linha fica verde. “Vai sobrar” considera tudo o que está lançado; “Na conta agora” só o que está marcado.
         Parcelas no formato 3/8: em “Começar o mês” elas avançam sozinhas e a última não se repete.
       </p>
     </>

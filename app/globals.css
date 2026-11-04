@@ -391,7 +391,6 @@ button.tag:hover { filter: brightness(.96); }
 .pf-tbl tr.pf-feito td { background: var(--surface-2); }
 .pf-tbl tr.pf-feito input:not([type=checkbox]) { color: var(--muted); }
 .pf-add { padding: 8px 10px 12px; }
-@media (max-width: 600px) { .pf-tbl th:nth-child(5), .pf-tbl td:nth-child(5) { display: none; } .pf-tbl th:nth-child(3) { width: 92px !important; } }
 /* Data no final do contrato: clique para alterar (o campo some na impressão) */
 .ct-data-edit { position: relative; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; border-radius: 4px; padding: 2px 4px; }
 .ct-data-edit:hover { background: var(--warn-soft); }
@@ -422,3 +421,17 @@ button.tag:hover { filter: brightness(.96); }
 .vt-item-top { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; }
 .vt-item-top .vt-nome { font-weight: 500; }
 .vt-linha { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 6px; align-items: center; padding: 2px 0; }
+/* Coluna Pago? e linha verde quando feito */
+.pf-pago { border: 1px solid var(--line-2); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 3px 10px; font: inherit; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
+.pf-pago:hover { border-color: var(--ok); }
+.pf-pago.on { background: var(--ok); border-color: var(--ok); color: #fff; font-weight: 500; }
+.pf-tbl tr.pf-feito td { background: var(--ok-soft); }
+.pf-tbl tr.pf-feito input:not([type=checkbox]) { color: var(--ink); }
+@media (max-width: 600px) {
+  .pf-tbl { table-layout: fixed; width: 100%; min-width: 0 !important; }
+  .pf-tbl th:nth-child(4), .pf-tbl td:nth-child(4) { display: none; }
+  .pf-tbl th:nth-child(2) { width: 74px !important; } .pf-tbl th:nth-child(3) { width: 50px !important; }
+  .pf-tbl th:nth-child(5) { width: 62px !important; } .pf-tbl th:nth-child(6) { width: 30px !important; }
+  .pf-tbl td { padding: 2px 3px; } .pf-tbl input { padding: 6px 4px !important; }
+  .pf-pago { padding: 3px 7px; font-size: 12px; }
+}
