@@ -16,11 +16,11 @@ async function gravarLinhas(mes, linhas) {
   const vals = [];
   const ph = validas.map((l, i) => {
     vals.push(mes, l.tipo, String(l.descricao || '').trim().slice(0, 200), Math.round((Number(String(l.valor).replace(',', '.')) || 0) * 100) / 100,
-      !!l.feito, String(l.parcela || '').trim() || null, dataOk(l.data), String(l.obs || '').trim() || null, i);
-    const b = i * 9;
-    return `($${b + 1},$${b + 2},$${b + 3},$${b + 4},$${b + 5},$${b + 6},$${b + 7},$${b + 8},$${b + 9})`;
+      !!l.feito, String(l.parcela || '').trim() || null, dataOk(l.data), String(l.obs || '').trim() || null, i, l.feito ? dataOk(l.pago_em) : null);
+    const b = i * 10;
+    return `(${Array.from({ length: 10 }, (_, k) => `$${b + k + 1}`).join(',')})`;
   });
-  await q(`INSERT INTO pf_lancamentos (mes, tipo, descricao, valor, feito, parcela, data, obs, ordem) VALUES ${ph.join(',')}`, vals);
+  await q(`INSERT INTO pf_lancamentos (mes, tipo, descricao, valor, feito, parcela, data, obs, ordem, pago_em) VALUES ${ph.join(',')}`, vals);
 }
 
 async function gravarSaldo(mes, saldo) {

@@ -1,13 +1,13 @@
 'use client';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { TIPOS, resumoMes } from '@/lib/pessoal';
-import { brl, nomeMes } from '@/lib/format';
+import { brl, nomeMes, hoje } from '@/lib/format';
 
 let seq = 0;
-const nova = (tipo, extra = {}) => ({ key: 'n' + (++seq), tipo, descricao: '', valor: '', feito: false, parcela: '', data: '', obs: '', ...extra });
+const nova = (tipo, extra = {}) => ({ key: 'n' + (++seq), tipo, descricao: '', valor: '', feito: false, pago_em: '', parcela: '', data: '', obs: '', ...extra });
 
 export default function PessoalMes({ mes, inicial, saldoAuto, saldoManualInicial, podeComecar, mesAnterior, salvar, comecar }) {
-  const [linhas, setLinhas] = useState(() => inicial.map((l) => ({ ...l, key: 'k' + (++seq), parcela: l.parcela || '', data: l.data || '', obs: l.obs || '' })));
+  const [linhas, setLinhas] = useState(() => inicial.map((l) => ({ ...l, key: 'k' + (++seq), parcela: l.parcela || '', data: l.data || '', obs: l.obs || '', pago_em: l.pago_em || '' })));
   const [saldoManual, setSaldoManual] = useState(saldoManualInicial);
   const [editSaldo, setEditSaldo] = useState(false);
   const [estado, setEstado] = useState('salvo'); // salvo | pendente | salvando | erro
@@ -109,7 +109,7 @@ export default function PessoalMes({ mes, inicial, saldoAuto, saldoManualInicial
               </header>
               <div className="table-wrap">
                 <table className="tbl pf-tbl">
-                  <thead><tr><th>Descrição</th><th className="r" style={{ width: 110 }}>Valor</th><th style={{ width: 64 }}>Parcela</th><th style={{ width: 128 }}>Data</th><th style={{ width: 86 }}>{tp.feito}?</th><th style={{ width: 34 }}></th></tr></thead>
+                  <thead><tr><th>Descrição</th><th className="r" style={{ width: 110 }}>Valor</th><th style={{ width: 64 }}>Parcela</th><th style={{ width: 128 }}>Vencimento</th><th style={{ width: 86 }}>{tp.feito}?</th><th style={{ width: 34 }}></th></tr></thead>
                   <tbody>
                     {ls.map((l) => (
                       <tr key={l.key} className={l.feito ? 'pf-feito' : ''}>
@@ -117,7 +117,14 @@ export default function PessoalMes({ mes, inicial, saldoAuto, saldoManualInicial
                         <td><input style={{ ...inp, textAlign: 'right' }} type="number" step="0.01" min="0" value={l.valor} placeholder="0,00" onChange={(e) => setL(l.key, { valor: e.target.value })} aria-label="Valor" /></td>
                         <td><input style={inp} value={l.parcela} placeholder="—" onChange={(e) => setL(l.key, { parcela: e.target.value })} aria-label="Parcela (ex.: 3/8)" /></td>
                         <td><input style={inp} type="date" value={l.data} onChange={(e) => setL(l.key, { data: e.target.value })} aria-label="Data" /></td>
-                        <td><button type="button" className={'pf-pago' + (l.feito ? ' on' : '')} aria-pressed={!!l.feito} onClick={() => setL(l.key, { feito: !l.feito })} title="Clique para marcar ou desmarcar">{l.feito ? '✓ Sim' : 'Não'}</button></td>
+                        <td><button type="button" className={'pf-pago' + (l.feito ? ' on' : '')} aria-pressed={!!l.feito} onClick={() => setL(l.key, l.feito ? { feito: false, pago_em: '' } : { feito: true, pago_em: hoje() })} title="Clique para marcar ou desmarcar">{l.feito ? '✓ Sim' : 'Não'}</button>
+                          {l.feito && (
+                            <label className="pf-pago-data" title="Data em que foi feito — clique para alterar">
+                              {l.pago_em ? l.pago_em.split('-').reverse().join('/') : 'sem data'}
+                              <input type="date" value={l.pago_em || ''} onChange={(e) => setL(l.key, { pago_em: e.target.value })} onClick={(e) => { try { e.currentTarget.showPicker?.(); } catch {} }} aria-label={`Data: ${l.descricao || 'item'}`} />
+                            </label>
+                          )}
+                        </td>
                         <td className="r"><button type="button" className="btn ghost sm" onClick={() => del(l.key)} aria-label="Remover linha">✕</button></td>
                       </tr>
                     ))}

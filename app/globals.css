@@ -435,3 +435,6 @@ button.tag:hover { filter: brightness(.96); }
   .pf-tbl td { padding: 2px 3px; } .pf-tbl input { padding: 6px 4px !important; }
   .pf-pago { padding: 3px 7px; font-size: 12px; }
 }
+.pf-pago-data { position: relative; display: block; margin-top: 2px; font-size: 11.5px; color: var(--ok); cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; white-space: nowrap; }
+.pf-pago-data input { position: absolute; inset: 0; width: 100% !important; height: 100%; opacity: 0; cursor: pointer; padding: 0 !important; border: 0 !important; }
+.pf-tbl td:nth-last-child(2) { vertical-align: middle; }

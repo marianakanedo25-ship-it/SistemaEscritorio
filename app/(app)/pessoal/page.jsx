@@ -13,7 +13,7 @@ export default async function PessoalPage({ searchParams }) {
   const m = ymValido(sp?.m) ? sp.m : mesAtual();
   const [dados, linhas, cfg] = await Promise.all([
     resumoDosMeses(),
-    q('SELECT id, tipo, descricao, valor, feito, parcela, data, obs FROM pf_lancamentos WHERE mes = $1 ORDER BY ordem, id', [m]),
+    q('SELECT id, tipo, descricao, valor, feito, parcela, data, obs, pago_em FROM pf_lancamentos WHERE mes = $1 ORDER BY ordem, id', [m]),
     q('SELECT saldo_inicial FROM pf_meses WHERE mes = $1', [m]),
   ]);
   const vazioGeral = !dados.meses.length;
