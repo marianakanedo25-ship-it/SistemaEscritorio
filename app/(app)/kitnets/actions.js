@@ -147,6 +147,7 @@ export async function salvarVistoriaKitnet(id, v) {
     condicoes: v?.condicoes && typeof v.condicoes === 'object' ? v.condicoes : {},
     ambientes: Array.isArray(v?.ambientes) ? v.ambientes.slice(0, 30).map((a) => ({ nome: String(a.nome || ''), itens: String(a.itens || ''), condicoes: String(a.condicoes || ''), obs: String(a.obs || '') })) : [],
     obsGerais: String(v?.obsGerais || ''), wifi: String(v?.wifi || ''),
+    itens: Array.isArray(v?.itens) ? v.itens.slice(0, 40).map((it) => ({ nome: String(it.nome || ''), op: (Array.isArray(it.op) ? it.op : ['Bom', 'Regular', 'Ruim']).map(String).slice(0, 4) })) : undefined,
   };
   await q('UPDATE kit_unidades SET vistoria = $2::jsonb WHERE id = $1', [u.id, JSON.stringify(limpo)]);
   return { ok: true };

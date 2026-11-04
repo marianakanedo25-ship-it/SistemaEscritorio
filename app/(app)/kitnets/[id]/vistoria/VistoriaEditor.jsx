@@ -15,6 +15,18 @@ export default function VistoriaEditor({ id, grupo, kitnet, partes, inicial, pad
   const setCond = (item, col, val) => { setV((x) => ({ ...x, condicoes: { ...x.condicoes, [item]: { ...(x.condicoes[item] || {}), [col]: x.condicoes[item]?.[col] === val ? '' : val } } })); setSujo(true); };
   const setAmb = (i, patch) => { setV((x) => ({ ...x, ambientes: x.ambientes.map((a, j) => (j === i ? { ...a, ...patch } : a)) })); setSujo(true); };
   const flash = (t) => { setMsg(t); setTimeout(() => setMsg(''), 3000); };
+  const itens = Array.isArray(v.itens) && v.itens.length ? v.itens : ITENS_CONDICAO;
+  const setItens = (fn) => { setV((x) => ({ ...x, itens: fn(Array.isArray(x.itens) && x.itens.length ? x.itens : ITENS_CONDICAO) })); setSujo(true); };
+  const renomear = (i, nome) => {
+    setV((x) => {
+      const lista = (Array.isArray(x.itens) && x.itens.length ? x.itens : ITENS_CONDICAO).map((it, j) => (j === i ? { ...it, nome } : it));
+      const antigo = (Array.isArray(x.itens) && x.itens.length ? x.itens : ITENS_CONDICAO)[i].nome;
+      const cond = { ...x.condicoes }; if (antigo !== nome) { cond[nome] = cond[antigo]; delete cond[antigo]; }
+      return { ...x, itens: lista, condicoes: cond };
+    });
+    setSujo(true);
+  };
+  const OPCOES = { 'Bom / Regular / Ruim': ['Bom', 'Regular', 'Ruim'], 'OK / Com defeito': ['OK', 'Com defeito'] };
 
   async function gravar() {
     const r = await salvar(id, v);
@@ -75,25 +87,33 @@ export default function VistoriaEditor({ id, grupo, kitnet, partes, inicial, pad
           </fieldset>
 
           <fieldset className="kc-grupo"><legend>Condições gerais</legend>
-            <table className="vt-tbl">
-              <thead><tr><th>Item</th><th>Entrada</th><th>Saída</th></tr></thead>
-              <tbody>
-                {ITENS_CONDICAO.map((it) => (
-                  <tr key={it.nome}>
-                    <td>{it.nome}</td>
-                    {['entrada', 'saida'].map((col) => (
-                      <td key={col}>
-                        <div className="vt-ops">
-                          {it.op.map((o) => (
-                            <button key={o} type="button" className={'vt-op' + (v.condicoes[it.nome]?.[col] === o ? ' on' : '')} onClick={() => setCond(it.nome, col, o)}>{o}</button>
-                          ))}
-                        </div>
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="vt-lista">
+              {itens.map((it, i) => (
+                <div key={i} className="vt-item">
+                  <div className="vt-item-top">
+                    <input className="vt-nome" aria-label="Item" value={it.nome} onChange={(e) => renomear(i, e.target.value)} />
+                    <button type="button" className="btn ghost sm" aria-label={`Remover ${it.nome}`} onClick={() => setItens((l) => l.filter((_, j) => j !== i))}>✕</button>
+                  </div>
+                  {[['entrada', 'Entrada'], ['saida', 'Saída']].map(([col, rot]) => (
+                    <div key={col} className="vt-linha">
+                      <span className="small">{rot}</span>
+                      <div className="vt-ops">
+                        {it.op.map((o) => (
+                          <button key={o} type="button" className={'vt-op' + (v.condicoes[it.nome]?.[col] === o ? ' on' : '')} onClick={() => setCond(it.nome, col, o)}>{o}</button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div className="actions" style={{ marginTop: 10 }}>
+              {Object.entries(OPCOES).map(([rot, op]) => (
+                <button key={rot} type="button" className="btn sm" onClick={() => setItens((l) => [...l, { nome: 'Novo item', op }])}>+ Item ({rot})</button>
+              ))}
+              <button type="button" className="btn ghost sm" onClick={() => { setV((x) => ({ ...x, itens: ITENS_CONDICAO })); setSujo(true); }}>Restaurar itens do modelo</button>
+            </div>
+            <p className="small" style={{ margin: '6px 0 0' }}>Kitnet mobiliada? Acrescente os móveis aqui (ex.: Cama, Guarda-roupa, Geladeira) e descreva-os nos ambientes abaixo.</p>
           </fieldset>
 
           <fieldset className="kc-grupo"><legend>Descrição por ambiente</legend>
@@ -143,8 +163,8 @@ export default function VistoriaEditor({ id, grupo, kitnet, partes, inicial, pad
           <table className="vt-cond">
             <thead><tr><th>Item</th><th>Entrada</th><th>Saída</th></tr></thead>
             <tbody>
-              {ITENS_CONDICAO.map((it) => (
-                <tr key={it.nome}>
+              {itens.map((it, i) => (
+                <tr key={i}>
                   <td>{it.nome}</td>
                   {['entrada', 'saida'].map((col) => (
                     <td key={col}>{it.op.map((o) => <span key={o} className="vt-m">{marca(v.condicoes[it.nome]?.[col] === o)} {o}</span>)}</td>

@@ -414,3 +414,11 @@ button.tag:hover { filter: brightness(.96); }
 .vt-cond th { background: #f2f2f2; }
 .vt-m { white-space: nowrap; margin-right: 10px; }
 .vt-amb { break-inside: avoid; }
+.vt-tbl td:first-child { display: flex; gap: 4px; align-items: flex-start; }
+.vt-nome { border: 1px solid transparent; border-radius: 6px; padding: 3px 6px; width: 100%; min-width: 0; font: inherit; background: transparent; }
+.vt-nome:hover { border-color: var(--line); } .vt-nome:focus { border-color: var(--primary); outline: none; background: var(--surface); }
+.vt-lista { display: flex; flex-direction: column; gap: 8px; }
+.vt-item { border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px 8px; background: var(--surface-2); }
+.vt-item-top { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; }
+.vt-item-top .vt-nome { font-weight: 500; }
+.vt-linha { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 6px; align-items: center; padding: 2px 0; }
