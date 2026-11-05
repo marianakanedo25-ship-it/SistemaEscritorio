@@ -1,7 +1,10 @@
 'use client';
 import { useMemo, useState, useTransition } from 'react';
-import { montarContrato, addMeses } from '@/lib/contrato-kitnet';
+import { montarContrato, addMeses, NEG_INI, NEG_FIM } from '@/lib/contrato-kitnet';
 
+// Texto com os dados preenchidos em negrito
+const comNegrito = (t) => String(t || '').split(new RegExp(`(${NEG_INI}[\\s\\S]*?${NEG_FIM})`)).map((p, i) =>
+  p.startsWith(NEG_INI) ? <strong key={i}>{p.slice(1, -1)}</strong> : p);
 const umDia = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 const isoOk = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || ''));
 
@@ -162,7 +165,7 @@ export default function ContratoEditor({ id, grupo, inicial, temDadosLocador, sa
             if (b.t === 'local') return (
               <p key={i} className="ct-local">
                 <label className="ct-data-edit" title="Clique para alterar a data">
-                  {b.texto}
+                  <span>{comNegrito(b.texto)}</span>
                   <input type="date" value={d.dataAssinatura || ''} onChange={(e) => set({ dataAssinatura: e.target.value })} aria-label="Data da assinatura" className="no-print" />
                 </label>
               </p>
@@ -176,7 +179,7 @@ export default function ContratoEditor({ id, grupo, inicial, temDadosLocador, sa
                 <div><span className="linha" />Testemunha 2<br />CPF:</div>
               </div>
             );
-            return <p key={i} className={'ct-' + b.t}>{b.rotulo && <strong>{b.rotulo} </strong>}{b.texto}</p>;
+            return <p key={i} className={'ct-' + b.t}>{b.rotulo && <strong>{b.rotulo} </strong>}{comNegrito(b.texto)}</p>;
           })}
         </article>
       </div>
