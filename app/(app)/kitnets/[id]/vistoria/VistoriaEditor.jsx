@@ -145,6 +145,7 @@ export default function VistoriaEditor({ id, grupo, kitnet, partes, inicial, pad
 
       <div className="prop-preview">
         <article className="contrato vistoria">
+          <table className="folha-pag"><thead><tr><td><div className="ct-esp" /></td></tr></thead><tfoot><tr><td><div className="ct-esp" /></td></tr></tfoot><tbody><tr><td>
           <h1>Termo de Vistoria de Imóvel — Entrada / Saída</h1>
           <table className="vt-dados"><tbody>
             <tr><th>Locador(a)</th><td>{partes.locador || '__________'}</td></tr>
@@ -201,6 +202,7 @@ export default function VistoriaEditor({ id, grupo, kitnet, partes, inicial, pad
             <div><span className="linha" /><strong>{partes.locador || '__________'} – Locador(a)</strong><br />CPF: {partes.locadorCpf || '__________'}</div>
             <div><span className="linha" /><strong>{partes.locatario || '__________'} – Locatário(a)</strong><br />CPF: {partes.locatarioCpf || '__________'}</div>
           </div>
+          </td></tr></tbody></table>
         </article>
       </div>
     </div>

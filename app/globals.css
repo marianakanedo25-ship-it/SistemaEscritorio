@@ -339,7 +339,9 @@ button.tag:hover { filter: brightness(.96); }
 .tbl tfoot td { padding: 13px 18px; border-top: 2px solid var(--line-2); background: var(--surface-2); }
 
 /* ---------- contrato das kitnets ---------- */
-@page contrato { size: A4; margin: 20mm 22mm 20mm; }
+/* Margem 0: o navegador não tem onde imprimir data, título e endereço. O respiro vem do .ct-esp e do padding. */
+@page contrato { size: A4; margin: 0; }
+.ct-esp { height: 18mm; }
 .kc-grupo { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px 14px; margin: 0; min-width: 0; }
 .kc-grupo legend { padding: 0 6px; font-weight: 600; font-size: 13px; }
 .kc-grupo summary { cursor: pointer; }
@@ -356,7 +358,7 @@ button.tag:hover { filter: brightness(.96); }
 .ct-ass .linha { display: block; border-top: 1px solid #222; margin-bottom: 6px; }
 @media print {
   body:has(.contrato) { page: contrato; background: #fff !important; }
-  .contrato { width: auto; max-width: none; padding: 0; box-shadow: none; }
+  .contrato { width: auto; max-width: none; padding: 0 22mm; box-shadow: none; }
 }
 /* Leitura que passou da energia inclusa no aluguel */
 .tbl tr.linha-excede > td { background: var(--warn-soft); }

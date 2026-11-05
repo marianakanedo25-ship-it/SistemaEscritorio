@@ -159,6 +159,7 @@ export default function ContratoEditor({ id, grupo, inicial, temDadosLocador, sa
 
       <div className="prop-preview">
         <article className="contrato">
+          <table className="folha-pag"><thead><tr><td><div className="ct-esp" /></td></tr></thead><tfoot><tr><td><div className="ct-esp" /></td></tr></tfoot><tbody><tr><td>
           {blocos.map((b, i) => {
             if (b.t === 'titulo') return <h1 key={i}>{b.texto}</h1>;
             if (b.t === 'secao') return <h2 key={i}>{b.texto}</h2>;
@@ -181,6 +182,7 @@ export default function ContratoEditor({ id, grupo, inicial, temDadosLocador, sa
             );
             return <p key={i} className={'ct-' + b.t}>{b.rotulo && <strong>{b.rotulo} </strong>}{comNegrito(b.texto)}</p>;
           })}
+          </td></tr></tbody></table>
         </article>
       </div>
     </div>
