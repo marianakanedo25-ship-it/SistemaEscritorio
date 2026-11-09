@@ -440,3 +440,6 @@ button.tag:hover { filter: brightness(.96); }
 .pf-pago-data { position: relative; display: block; margin-top: 2px; font-size: 11.5px; color: var(--ok); cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; white-space: nowrap; }
 .pf-pago-data input { position: absolute; inset: 0; width: 100% !important; height: 100%; opacity: 0; cursor: pointer; padding: 0 !important; border: 0 !important; }
 .pf-tbl td:nth-last-child(2) { vertical-align: middle; }
+/* Compromisso no calendário: é um botão que abre a edição */
+button.ev-btn { border: 0; width: 100%; text-align: left; cursor: pointer; font-family: inherit; }
+button.ev-btn:hover { filter: brightness(1.12); }

@@ -48,7 +48,8 @@ export default async function AgendaPage({ searchParams }) {
 
   const porDia = {};
   const push = (d, item) => { (porDia[d] ||= []).push(item); };
-  for (const ev of eventos) push(ev.data, { tipo: 'evento', ...ev });
+  // tipoEvento guarda Reunião/Visita/Pessoal…; tipo identifica o item na agenda
+  for (const ev of eventos) push(ev.data, { ...ev, tipoEvento: ev.tipo, tipo: 'evento' });
   // Cada etapa aparece no dia de início e no dia do prazo (uma vez só, se forem o mesmo dia).
   for (const e of etapas) {
     const mesmoDia = !e.inicio || e.inicio === e.prazo;
@@ -75,7 +76,14 @@ export default async function AgendaPage({ searchParams }) {
       return <Link href={`/projetos/${it.projeto_id}#etapas`} className={'ev' + (ini ? ' inicio' : '') + (it.status === 'concluida' ? ' done' : '') + (late && !ini ? ' late' : '')} style={{ '--c': it.cor }} title={`${rot}${it.nome} · ${it.projeto}${periodo} · ${STATUS_ETAPA[it.status]}`}>{rot}{curto ? it.nome : `${it.nome} · ${it.projeto}`}</Link>;
     }
     if (it.tipo === 'evento') {
-      return <Link href={qs({ d: it.data }) + '#dia'} className="ev" style={{ '--c': it.cor || '#5E564F' }} title={`${it.titulo}${it.projeto ? ' · ' + it.projeto : ''}`}>{it.hora ? it.hora.slice(0, 5) + ' ' : ''}{it.titulo}</Link>;
+      // Clicar no compromisso abre a edição (com Excluir) direto do calendário
+      async function del() { 'use server'; await excluirEvento(it.id); }
+      return (
+        <Modal titulo="Editar compromisso" classe="ev ev-btn" estilo={{ '--c': it.cor || '#5E564F' }} dica={`${it.titulo}${it.projeto ? ' · ' + it.projeto : ''} — clique para editar`}
+          botao={<>{it.hora ? it.hora.slice(0, 5) + ' ' : ''}{it.titulo}</>} action={salvarEvento} extraFoot={<ConfirmButton action={del} />}>
+          <EventoCampos e={{ ...it, tipo: it.tipoEvento || it.tipo }} projetos={projetos} />
+        </Modal>
+      );
     }
     const pago = !!it.pago_em;
     const atras = !pago && it.data < hj;
@@ -85,11 +93,12 @@ export default async function AgendaPage({ searchParams }) {
   const dias = [];
   for (let d = ini; d <= fim; d = addDias(d, 1)) dias.push(d);
   const itensDia = dia ? porDia[dia] || [] : [];
+  const eventosPeriodo = eventos.filter((e) => vista === 'semana' || e.data.slice(0, 7) === ym);
 
   return (
     <>
       <div className="page-head">
-        <div><h1>Agenda</h1><p className="sub">Início e prazo das etapas de cada projeto, reuniões, visitas e entregas.</p></div>
+        <div><h1>Agenda</h1><p className="sub">Início e prazo das etapas dos projetos e os seus compromissos. Clique num compromisso para editar ou excluir.</p></div>
         <div className="actions">
           <Modal titulo="Novo compromisso" botao="+ Compromisso" classe="btn primary" action={salvarEvento}>
             <EventoCampos projetos={projetos} dataPadrao={dia || undefined} />
@@ -144,6 +153,37 @@ export default async function AgendaPage({ searchParams }) {
         <span>Riscado: etapa concluída</span>
       </div>
 
+      <section className="card pad" style={{ marginBottom: 20 }}>
+        <div className="card-head">
+          <h2>Compromissos {vista === 'semana' ? 'da semana' : 'de ' + nomeMes(ym).toLowerCase()}</h2>
+          <Modal titulo="Novo compromisso" botao="+ Compromisso" classe="btn sm" action={salvarEvento}>
+            <EventoCampos projetos={projetos} dataPadrao={dia || undefined} />
+          </Modal>
+        </div>
+        {eventosPeriodo.length ? (
+          <div className="list">
+            {eventosPeriodo.map((it) => {
+              async function del() { 'use server'; await excluirEvento(it.id); }
+              return (
+                <div className="li" key={'lp' + it.id}>
+                  <div className="t" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                    <span className="dot" style={{ background: it.cor || 'var(--side)' }} />
+                    <div><strong>{data(it.data).slice(0, 5)}{it.hora ? ' · ' + it.hora.slice(0, 5) : ''} · {it.titulo}</strong>
+                      <span className="small">{TIPOS_EVENTO[it.tipoEvento || it.tipo] || 'Compromisso'}{it.projeto ? ' · ' + it.projeto : ''}{it.local ? ' · ' + it.local : ''}</span></div>
+                  </div>
+                  <div className="actions" style={{ flexWrap: 'nowrap' }}>
+                    <Modal titulo="Editar compromisso" botao="Editar" classe="btn sm" action={salvarEvento}>
+                      <EventoCampos e={{ ...it, tipo: it.tipoEvento || it.tipo }} projetos={projetos} />
+                    </Modal>
+                    <ConfirmButton action={del} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : <p className="small">Nenhum compromisso neste período. Use “+ Compromisso” para marcar reuniões, visitas, consultas ou qualquer outro compromisso fora das etapas dos projetos.</p>}
+      </section>
+
       {dia && (
         <section className="card pad" id="dia">
           <div className="card-head">
@@ -162,11 +202,11 @@ export default async function AgendaPage({ searchParams }) {
                       <div className="t" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                         <span className="dot" style={{ background: it.cor || 'var(--side)' }} />
                         <div><strong>{it.hora ? it.hora.slice(0, 5) + ' · ' : ''}{it.titulo}</strong>
-                          <span className="small">{TIPOS_EVENTO[it.tipo] || 'Compromisso'}{it.projeto ? ' · ' + it.projeto : ''}{it.local ? ' · ' + it.local : ''}</span>
+                          <span className="small">{TIPOS_EVENTO[it.tipoEvento || it.tipo] || 'Compromisso'}{it.projeto ? ' · ' + it.projeto : ''}{it.local ? ' · ' + it.local : ''}</span>
                           {it.obs && <span className="small">{it.obs}</span>}</div>
                       </div>
                       <Modal titulo="Editar compromisso" botao="Editar" classe="btn sm" action={salvarEvento} extraFoot={<ConfirmButton action={del} />}>
-                        <EventoCampos e={it} projetos={projetos} />
+                        <EventoCampos e={{ ...it, tipo: it.tipoEvento || it.tipo }} projetos={projetos} />
                       </Modal>
                     </div>
                   );

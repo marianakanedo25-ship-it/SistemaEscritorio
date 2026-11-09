@@ -5,7 +5,7 @@ import { useRef, useState, useTransition } from 'react';
  * Botão que abre uma janela com formulário.
  * `action` é uma server action que recebe FormData e pode devolver { erro }.
  */
-export default function Modal({ titulo, botao, classe = 'btn', children, action, enviar = 'Salvar', extraFoot }) {
+export default function Modal({ titulo, botao, classe = 'btn', children, action, enviar = 'Salvar', extraFoot, estilo, dica }) {
   const ref = useRef(null);
   const [erro, setErro] = useState('');
   const [pending, start] = useTransition();
@@ -23,7 +23,7 @@ export default function Modal({ titulo, botao, classe = 'btn', children, action,
   }
   return (
     <>
-      <button type="button" className={classe} onClick={abrir}>{botao}</button>
+      <button type="button" className={classe} style={estilo} title={dica} onClick={abrir}>{botao}</button>
       <dialog ref={ref} className="modal" onClick={(e) => { if (e.target === ref.current) fechar(); }}>
         <form className="mbody" onSubmit={onSubmit} key={key}>
           <div className="mhead"><h2>{titulo}</h2><button type="button" className="x" onClick={fechar} aria-label="Fechar">×</button></div>
