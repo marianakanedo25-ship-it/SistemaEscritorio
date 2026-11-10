@@ -450,7 +450,9 @@ button.ev-btn:hover { filter: brightness(1.12); }
 .pf-extra-fim { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 6px 16px 10px; padding: 14px 16px; background: var(--primary-soft); border-radius: 10px; }
 .pf-extra-fim span { font-size: 16px; font-weight: 500; }
 .pf-extra-fim strong { font-family: var(--f-display); font-size: 34px; font-weight: 600; line-height: 1.1; }
-@media (max-width: 600px) { .pf-extra .pf-tbl th:nth-child(3), .pf-extra .pf-tbl td:nth-child(3) { display: none; } .pf-extra-fim strong { font-size: 28px; } }
+@media (max-width: 600px) { .pf-extra .pf-tbl th:nth-child(2) { width: 78px !important; } .pf-extra .pf-tbl th:nth-child(3) { width: 84px !important; } .pf-extra .pf-tbl th:nth-child(4) { width: 30px !important; } .pf-extra-fim strong { font-size: 28px; } }
+.pf-data-gasto { position: relative; display: inline-block; padding: 6px 4px; color: var(--ink); cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pf-data-gasto input { position: absolute; inset: 0; width: 100% !important; height: 100%; opacity: 0; cursor: pointer; padding: 0 !important; border: 0 !important; }
 .pf-falta { font-weight: 600; }
 .pf-falta.wrn { color: var(--warn); }
 .pf-falta.ok { color: var(--ok); }

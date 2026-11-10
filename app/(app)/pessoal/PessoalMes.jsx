@@ -98,13 +98,18 @@ export default function PessoalMes({ mes, inicial, saldoAuto, saldoManualInicial
         <div className="pf-extra-ini"><span>Sobra do mês pelo planejado</span><strong className="num">{brl(r.sobraPlanejada)}</strong></div>
         <div className="table-wrap">
           <table className="tbl pf-tbl">
-            <thead><tr><th>O que foi</th><th className="r" style={{ width: 120 }}>Valor</th><th style={{ width: 128 }}>Data</th><th style={{ width: 34 }}></th></tr></thead>
+            <thead><tr><th>O que foi</th><th className="r" style={{ width: 120 }}>Valor</th><th style={{ width: 110 }}>Dia do gasto</th><th style={{ width: 34 }}></th></tr></thead>
             <tbody>
               {linhas.filter((l) => l.tipo === 'extra').map((l) => (
                 <tr key={l.key}>
                   <td><input style={inp} value={l.descricao} placeholder="Ex.: farmácia, presente, conserto" onChange={(e) => setL(l.key, { descricao: e.target.value })} aria-label="O que foi" /></td>
                   <td><input style={{ ...inp, textAlign: 'right' }} type="number" step="0.01" min="0" value={l.valor} placeholder="0,00" onChange={(e) => setL(l.key, { valor: e.target.value })} aria-label="Valor" /></td>
-                  <td><input style={inp} type="date" value={l.data} onChange={(e) => setL(l.key, { data: e.target.value })} aria-label="Data" /></td>
+                  <td>
+                    <label className="pf-data-gasto" title="Dia em que gastou — clique para alterar">
+                      {l.data ? l.data.split('-').reverse().join('/') : 'escolher'}
+                      <input type="date" value={l.data || ''} onChange={(e) => setL(l.key, { data: e.target.value })} onClick={(e) => { try { e.currentTarget.showPicker?.(); } catch {} }} aria-label={`Dia do gasto: ${l.descricao || 'item'}`} />
+                    </label>
+                  </td>
                   <td className="r"><button type="button" className="btn ghost sm" onClick={() => del(l.key)} aria-label="Remover linha">✕</button></td>
                 </tr>
               ))}
