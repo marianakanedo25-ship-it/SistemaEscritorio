@@ -451,3 +451,6 @@ button.ev-btn:hover { filter: brightness(1.12); }
 .pf-extra-fim span { font-size: 16px; font-weight: 500; }
 .pf-extra-fim strong { font-family: var(--f-display); font-size: 34px; font-weight: 600; line-height: 1.1; }
 @media (max-width: 600px) { .pf-extra .pf-tbl th:nth-child(3), .pf-extra .pf-tbl td:nth-child(3) { display: none; } .pf-extra-fim strong { font-size: 28px; } }
+.pf-falta { font-weight: 600; }
+.pf-falta.wrn { color: var(--warn); }
+.pf-falta.ok { color: var(--ok); }

@@ -137,7 +137,13 @@ export default function PessoalMes({ mes, inicial, saldoAuto, saldoManualInicial
             <section key={tp.id} className={'card pf-bloco pf-' + tp.id}>
               <header className="pf-head">
                 <div><h2>{tp.nome}</h2><span className="small">{tp.sub}</span></div>
-                <div className="r"><strong className="num">{brl(total)}</strong><span className="small">{tp.feito.toLowerCase()} {brl(feito)}</span></div>
+                <div className="r">
+                  <strong className="num">{brl(total)}</strong>
+                  <span className="small">{tp.feito.toLowerCase()} {brl(feito)}</span>
+                  <span className={'small pf-falta' + (total - feito > 0.004 ? ' wrn' : ' ok')}>
+                    {total - feito > 0.004 ? `${{ entrada: 'falta receber', investimento: 'falta investir' }[tp.id] || 'falta pagar'} ${brl(total - feito)}` : 'tudo em dia ✓'}
+                  </span>
+                </div>
               </header>
               <div className="table-wrap">
                 <table className="tbl pf-tbl">
