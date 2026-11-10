@@ -431,9 +431,9 @@ button.tag:hover { filter: brightness(.96); }
 .pf-tbl tr.pf-feito input:not([type=checkbox]) { color: var(--ink); }
 @media (max-width: 600px) {
   .pf-tbl { table-layout: fixed; width: 100%; min-width: 0 !important; }
-  .pf-tbl th:nth-child(4), .pf-tbl td:nth-child(4) { display: none; }
-  .pf-tbl th:nth-child(2) { width: 74px !important; } .pf-tbl th:nth-child(3) { width: 50px !important; }
-  .pf-tbl th:nth-child(5) { width: 62px !important; } .pf-tbl th:nth-child(6) { width: 30px !important; }
+  .pf-bloco .pf-tbl th:nth-child(4), .pf-bloco .pf-tbl td:nth-child(4) { display: none; }
+  .pf-bloco .pf-tbl th:nth-child(2) { width: 74px !important; } .pf-bloco .pf-tbl th:nth-child(3) { width: 50px !important; }
+  .pf-bloco .pf-tbl th:nth-child(5) { width: 62px !important; } .pf-bloco .pf-tbl th:nth-child(6) { width: 30px !important; }
   .pf-tbl td { padding: 2px 3px; } .pf-tbl input { padding: 6px 4px !important; }
   .pf-pago { padding: 3px 7px; font-size: 12px; }
 }
@@ -443,3 +443,11 @@ button.tag:hover { filter: brightness(.96); }
 /* Compromisso no calendário: é um botão que abre a edição */
 button.ev-btn { border: 0; width: 100%; text-align: left; cursor: pointer; font-family: inherit; }
 button.ev-btn:hover { filter: brightness(1.12); }
+/* Gastos fora do plano */
+.pf-extra { margin-bottom: 18px; border-top: 3px solid var(--bad); }
+.pf-extra-ini { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0 16px 6px; padding: 10px 12px; background: var(--surface-2); border-radius: 8px; font-size: 14.5px; }
+.pf-extra-ini strong { font-size: 18px; }
+.pf-extra-fim { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 6px 16px 10px; padding: 14px 16px; background: var(--primary-soft); border-radius: 10px; }
+.pf-extra-fim span { font-size: 16px; font-weight: 500; }
+.pf-extra-fim strong { font-family: var(--f-display); font-size: 34px; font-weight: 600; line-height: 1.1; }
+@media (max-width: 600px) { .pf-extra .pf-tbl th:nth-child(3), .pf-extra .pf-tbl td:nth-child(3) { display: none; } .pf-extra-fim strong { font-size: 28px; } }

@@ -26,7 +26,7 @@ export default async function PessoalAnoPage() {
       </div>
       <div className="card table-wrap">
         <table className="tbl">
-          <thead><tr><th>Mês</th><th className="r">Veio do anterior</th><th className="r">Entradas</th><th className="r">Contas</th><th className="r">Cartão XP</th><th className="r">Investido</th><th className="r">Vai sobrar</th><th className="r">Falta pagar</th></tr></thead>
+          <thead><tr><th>Mês</th><th className="r">Veio do anterior</th><th className="r">Entradas</th><th className="r">Contas</th><th className="r">Cartão XP</th><th className="r">Investido</th><th className="r">Fora do plano</th><th className="r">Vai sobrar</th><th className="r">Falta pagar</th></tr></thead>
           <tbody>
             {linhas.map(({ m, r }) => (
               <tr key={m}>
@@ -38,14 +38,15 @@ export default async function PessoalAnoPage() {
                     <td className="r num">{brl(r.contas)}</td>
                     <td className="r num">{brl(r.cartao)}</td>
                     <td className="r num">{brl(r.investimentos)}</td>
+                    <td className={'r num ' + (r.extras > 0 ? 'neg' : '')}>{brl(r.extras)}</td>
                     <td className={'r num ' + (r.sobra < 0 ? 'neg' : '')} style={{ fontWeight: 600 }}>{brl(r.sobra)}</td>
                     <td className={'r num ' + (r.aPagar > 0 ? 'wrn' : '')}>{brl(r.aPagar)}</td>
                   </>
-                ) : <td colSpan={7} className="small">Sem lançamentos</td>}
+                ) : <td colSpan={8} className="small">Sem lançamentos</td>}
               </tr>
             ))}
           </tbody>
-          <tfoot><tr><td><strong>Total</strong></td><td></td><td className="r num pos"><strong>{brl(soma('entradas'))}</strong></td><td className="r num"><strong>{brl(soma('contas'))}</strong></td><td className="r num"><strong>{brl(soma('cartao'))}</strong></td><td className="r num"><strong>{brl(soma('investimentos'))}</strong></td><td></td><td></td></tr></tfoot>
+          <tfoot><tr><td><strong>Total</strong></td><td></td><td className="r num pos"><strong>{brl(soma('entradas'))}</strong></td><td className="r num"><strong>{brl(soma('contas'))}</strong></td><td className="r num"><strong>{brl(soma('cartao'))}</strong></td><td className="r num"><strong>{brl(soma('investimentos'))}</strong></td><td className="r num"><strong>{brl(soma('extras'))}</strong></td><td></td><td></td></tr></tfoot>
         </table>
       </div>
     </>
