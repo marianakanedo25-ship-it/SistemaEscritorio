@@ -36,7 +36,8 @@ export default async function AgendaPage({ searchParams }) {
   const [etapas, eventos, projetos] = await Promise.all([
     q(`SELECT e.id, e.nome, e.inicio, e.prazo, e.status, p.id AS projeto_id, p.nome AS projeto, p.cor
        FROM etapas e JOIN projetos p ON p.id = e.projeto_id
-       WHERE e.prazo BETWEEN $1 AND $2 OR e.inicio BETWEEN $1 AND $2 ORDER BY coalesce(e.inicio, e.prazo), p.nome`, [ini, fim]),
+       WHERE e.prazo BETWEEN $1 AND $2 OR e.inicio BETWEEN $1 AND $2 OR (e.inicio < $1 AND e.prazo > $2)
+       ORDER BY coalesce(e.inicio, e.prazo), p.nome`, [ini, fim]),
     q(`SELECT ev.*, p.nome AS projeto, p.cor FROM eventos ev LEFT JOIN projetos p ON p.id = ev.projeto_id
        WHERE ev.data BETWEEN $1 AND $2 ORDER BY ev.data, ev.hora NULLS FIRST`, [ini, fim]),
     q(`SELECT id, nome FROM projetos WHERE status <> 'concluido' ORDER BY nome`),
@@ -55,8 +56,17 @@ export default async function AgendaPage({ searchParams }) {
     const mesmoDia = !e.inicio || e.inicio === e.prazo;
     if (e.inicio && !mesmoDia && e.inicio >= ini && e.inicio <= fim) push(e.inicio, { tipo: 'etapa', marca: 'inicio', data: e.inicio, ...e });
     if (e.prazo && e.prazo >= ini && e.prazo <= fim) push(e.prazo, { tipo: 'etapa', marca: mesmoDia && e.inicio ? 'dia' : 'fim', data: e.prazo, ...e });
+    // Dias entre o início e o prazo: a etapa aparece em todos eles
+    if (e.inicio && e.prazo && e.prazo > e.inicio) {
+      for (let d = e.inicio >= ini ? addDias(e.inicio, 1) : ini; d < e.prazo && d <= fim; d = addDias(d, 1)) {
+        if (d >= ini) push(d, { tipo: 'etapa', marca: 'meio', data: d, ...e });
+      }
+    }
   }
   for (const f of financeiro) push(f.data, { tipo: 'fin', ...f });
+  // Em cada dia: compromissos, inícios e prazos primeiro; dias "em andamento" por último
+  const ordem = (it) => (it.tipo === 'evento' ? 0 : it.marca === 'meio' ? 3 : it.tipo === 'etapa' ? 1 : 2);
+  for (const d of Object.keys(porDia)) porDia[d].sort((a, b) => ordem(a) - ordem(b));
 
   const qs = (o) => {
     const p = new URLSearchParams({ v: vista, m: ym, ...(dia ? { d: dia } : {}), ...(fin ? { fin: '1' } : {}), ...o });
@@ -71,9 +81,10 @@ export default async function AgendaPage({ searchParams }) {
     if (it.tipo === 'etapa') {
       const late = it.status !== 'concluida' && it.prazo && it.prazo < hj;
       const ini = it.marca === 'inicio';
-      const rot = ini ? 'Início: ' : it.marca === 'fim' && it.inicio ? 'Prazo: ' : '';
+      const meio = it.marca === 'meio';
+      const rot = ini ? 'Início: ' : meio ? '' : it.marca === 'fim' && it.inicio ? 'Prazo: ' : '';
       const periodo = it.inicio && it.inicio !== it.prazo ? ` · ${data(it.inicio).slice(0, 5)} a ${it.prazo ? data(it.prazo).slice(0, 5) : '—'}` : '';
-      return <Link href={`/projetos/${it.projeto_id}#etapas`} className={'ev' + (ini ? ' inicio' : '') + (it.status === 'concluida' ? ' done' : '') + (late && !ini ? ' late' : '')} style={{ '--c': it.cor }} title={`${rot}${it.nome} · ${it.projeto}${periodo} · ${STATUS_ETAPA[it.status]}`}>{rot}{curto ? it.nome : `${it.nome} · ${it.projeto}`}</Link>;
+      return <Link href={`/projetos/${it.projeto_id}#etapas`} className={'ev' + (ini ? ' inicio' : '') + (meio ? ' meio' : '') + (it.status === 'concluida' ? ' done' : '') + (late && !ini && !meio ? ' late' : '')} style={{ '--c': it.cor }} title={`${rot}${it.nome} · ${it.projeto}${periodo} · ${STATUS_ETAPA[it.status]}`}>{rot}{curto ? it.nome : `${it.nome} · ${it.projeto}`}</Link>;
     }
     if (it.tipo === 'evento') {
       // Clicar no compromisso abre a edição (com Excluir) direto do calendário
@@ -148,6 +159,7 @@ export default async function AgendaPage({ searchParams }) {
       <div className="legend" style={{ margin: '12px 0 24px' }}>
         <span><span className="dot" style={{ background: 'var(--taupe)' }} /> Cada projeto tem a sua cor</span>
         <span><span className="dot" style={{ background: 'var(--surface)', border: '2px solid var(--taupe)' }} /> Contorno: início da etapa</span>
+        <span><span className="dot" style={{ background: 'color-mix(in srgb, var(--taupe) 25%, white)' }} /> Claro: dias em andamento</span>
         <span><span className="dot" style={{ background: 'var(--taupe)' }} /> Preenchido: prazo final</span>
         <span><span className="dot" style={{ background: 'var(--bad)' }} /> Barra vermelha: etapa atrasada</span>
         <span>Riscado: etapa concluída</span>
@@ -215,7 +227,7 @@ export default async function AgendaPage({ searchParams }) {
                   <div className="li" key={'t' + it.id + it.marca}>
                     <div className="t" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                       <span className="dot" style={{ background: it.cor }} />
-                      <div><strong>{it.marca === 'inicio' ? 'Início' : 'Prazo'}: {it.nome}</strong><span className="small"><Link href={`/projetos/${it.projeto_id}#etapas`}>{it.projeto}</Link>{it.inicio && it.inicio !== it.prazo ? ` · de ${data(it.inicio)} a ${it.prazo ? data(it.prazo) : 'sem prazo'}` : ''}</span></div>
+                      <div><strong>{it.marca === 'inicio' ? 'Início' : it.marca === 'meio' ? 'Em andamento' : 'Prazo'}: {it.nome}</strong><span className="small"><Link href={`/projetos/${it.projeto_id}#etapas`}>{it.projeto}</Link>{it.inicio && it.inicio !== it.prazo ? ` · de ${data(it.inicio)} a ${it.prazo ? data(it.prazo) : 'sem prazo'}` : ''}</span></div>
                     </div>
                     <span className={'tag ' + (it.status === 'concluida' ? 'ok' : it.prazo && it.prazo < hj ? 'bad' : 'warn')}>{it.status === 'concluida' ? 'Concluída' : it.prazo && it.prazo < hj ? 'Atrasada' : STATUS_ETAPA[it.status]}</span>
                   </div>
