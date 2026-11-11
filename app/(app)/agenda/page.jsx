@@ -61,12 +61,6 @@ export default async function AgendaPage({ searchParams }) {
     const mesmoDia = !e.inicio || e.inicio === e.prazo;
     if (e.inicio && !mesmoDia && e.inicio >= ini && e.inicio <= fim) push(e.inicio, { tipo: 'etapa', marca: 'inicio', data: e.inicio, ...e });
     if (e.prazo && e.prazo >= ini && e.prazo <= fim) push(e.prazo, { tipo: 'etapa', marca: mesmoDia && e.inicio ? 'dia' : 'fim', data: e.prazo, ...e });
-    // Dias entre o início e o prazo: a etapa aparece em todos eles
-    if (e.inicio && e.prazo && e.prazo > e.inicio) {
-      for (let d = e.inicio >= ini ? addDias(e.inicio, 1) : ini; d < e.prazo && d <= fim; d = addDias(d, 1)) {
-        if (d >= ini) push(d, { tipo: 'etapa', marca: 'meio', data: d, ...e });
-      }
-    }
   }
   for (const f of financeiro) push(f.data, { tipo: 'fin', ...f });
   // Em cada dia: compromissos, inícios e prazos primeiro; dias "em andamento" por último
@@ -108,7 +102,8 @@ export default async function AgendaPage({ searchParams }) {
 
   const dias = [];
   for (let d = ini; d <= fim; d = addDias(d, 1)) dias.push(d);
-  const itensDia = dia ? porDia[dia] || [] : [];
+  // No painel do dia (não no calendário), as etapas em andamento também aparecem, para reservar horário
+  const itensDia = dia ? [...(porDia[dia] || []), ...etapas.filter((e) => e.inicio && e.prazo && e.inicio < dia && e.prazo > dia).map((e) => ({ tipo: 'etapa', marca: 'meio', data: dia, ...e }))] : [];
   const minDia = itensDia.filter((it) => it.tipo === 'evento').reduce((t, it) => t + minutos(it), 0);
   const eventosPeriodo = eventos.filter((e) => vista === 'semana' || e.data.slice(0, 7) === ym);
 
@@ -165,7 +160,6 @@ export default async function AgendaPage({ searchParams }) {
       <div className="legend" style={{ margin: '12px 0 24px' }}>
         <span><span className="dot" style={{ background: 'var(--taupe)' }} /> Cada projeto tem a sua cor</span>
         <span><span className="dot" style={{ background: 'var(--surface)', border: '2px solid var(--taupe)' }} /> Contorno: início da etapa</span>
-        <span><span className="dot" style={{ background: 'color-mix(in srgb, var(--taupe) 25%, white)' }} /> Claro: dias em andamento</span>
         <span><span className="dot" style={{ background: 'var(--taupe)' }} /> Preenchido: prazo final</span>
         <span><span className="dot" style={{ background: 'var(--bad)' }} /> Barra vermelha: etapa atrasada</span>
         <span>Riscado: etapa concluída</span>
