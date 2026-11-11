@@ -26,11 +26,17 @@ export default function ProjetoCampos({ p = {}, clientes = [], novo = false, cli
       <label className="fld full"><span>Endereço da obra</span><input name="endereco_obra" defaultValue={p.endereco_obra || ''} /></label>
       <label className="fld full"><span>Pasta do projeto no Google Drive (link)</span><input name="pasta_drive" type="url" defaultValue={p.pasta_drive || ''} placeholder="https://drive.google.com/…" /></label>
       <fieldset className="fld full" style={{ border: 0, padding: 0, margin: 0 }}>
-        <span>Cor na agenda</span>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <span>Cor na agenda{novo ? ' (automática: o sistema escolhe uma cor que nenhum outro projeto está usando)' : ''}</span>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+          {novo && (
+            <label style={{ cursor: 'pointer', position: 'relative' }}>
+              <input type="radio" name="cor" value="" defaultChecked style={{ position: 'absolute', opacity: 0 }} />
+              <span className="cor-op cor-auto">Automática</span>
+            </label>
+          )}
           {CORES_PROJETO.map((cor, i) => (
             <label key={cor} style={{ cursor: 'pointer', position: 'relative' }}>
-              <input type="radio" name="cor" value={cor} defaultChecked={(p.cor || CORES_PROJETO[0]) === cor} style={{ position: 'absolute', opacity: 0 }} />
+              <input type="radio" name="cor" value={cor} defaultChecked={!novo && (p.cor || CORES_PROJETO[0]).toLowerCase() === cor.toLowerCase()} style={{ position: 'absolute', opacity: 0 }} />
               <span className="dot cor-op" style={{ width: 26, height: 26, background: cor }} aria-label={`Cor ${i + 1}`} />
             </label>
           ))}

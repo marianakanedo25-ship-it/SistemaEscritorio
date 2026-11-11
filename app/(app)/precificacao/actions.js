@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { q, one, getConfig, setConfig } from '@/lib/db';
 import { exigir } from '@/lib/auth';
+import { proximaCorProjeto } from '@/lib/cor-projeto';
 import { hoje } from '@/lib/format';
 import { CONFIG_PADRAO, calcular } from '@/lib/precificacao';
 
@@ -59,8 +60,8 @@ export async function criarProjetoDoOrcamento(id) {
   if (!o) return;
   if (o.projeto_id) redirect(`/projetos/${o.projeto_id}`);
   const nome = o.nome || 'Novo projeto';
-  const p = await one(`INSERT INTO projetos (cliente_id, nome, tipo, area, valor, status, inicio) VALUES ($1,$2,$3,$4,$5,'andamento',$6) RETURNING id`,
-    [o.cliente_id, nome, o.tipo, o.area, o.valor, hoje()]);
+  const p = await one(`INSERT INTO projetos (cliente_id, nome, tipo, area, valor, status, inicio, cor) VALUES ($1,$2,$3,$4,$5,'andamento',$6,$7) RETURNING id`,
+    [o.cliente_id, nome, o.tipo, o.area, o.valor, hoje(), await proximaCorProjeto()]);
   // Só as etapas marcadas na calculadora e com horas calculadas.
   const etapas = (o.dados?.etapas || []).filter((e) => e.on !== false && e.nome && Number(e.horas) > 0);
   for (let i = 0; i < etapas.length; i++) {

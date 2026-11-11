@@ -1,4 +1,5 @@
 'use server';
+import { proximaCorProjeto } from '@/lib/cor-projeto';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { q, one } from '@/lib/db';
@@ -21,8 +22,10 @@ export async function salvarProjeto(fd) {
   const id = int(fd, 'id');
   const nome = txt(fd, 'nome');
   if (!nome) return { erro: 'Informe o nome do projeto.' };
+  // Projeto novo sem cor escolhida: o sistema escolhe uma que ainda não está em uso
+  const cor = txt(fd, 'cor') || (id ? (await one('SELECT cor FROM projetos WHERE id = $1', [id]))?.cor : null) || await proximaCorProjeto();
   const vals = [int(fd, 'cliente_id'), nome, txt(fd, 'tipo'), num(fd, 'area'), txt(fd, 'endereco_obra'), txt(fd, 'status') || 'andamento',
-    txt(fd, 'cor') || '#7C847A', num(fd, 'valor'), txt(fd, 'inicio'), txt(fd, 'previsao'), txt(fd, 'pasta_drive'), txt(fd, 'obs')];
+    cor, num(fd, 'valor'), txt(fd, 'inicio'), txt(fd, 'previsao'), txt(fd, 'pasta_drive'), txt(fd, 'obs')];
   if (id) {
     await q(`UPDATE projetos SET cliente_id=$2, nome=$3, tipo=$4, area=$5, endereco_obra=$6, status=$7, cor=$8, valor=$9, inicio=$10, previsao=$11, pasta_drive=$12, obs=$13 WHERE id=$1`, [id, ...vals]);
     refresh(id);

@@ -458,3 +458,4 @@ button.ev-btn:hover { filter: brightness(1.12); }
 .pf-falta.ok { color: var(--ok); }
 /* Etapa nos dias entre o início e o prazo */
 .ev.meio { background: color-mix(in srgb, var(--c, var(--taupe)) 22%, white); color: var(--ink); border-left: 4px solid var(--c, var(--taupe)); }
+.cor-auto { border-radius: 999px; padding: 3px 10px; font-size: 12.5px; background: var(--surface); color: var(--ink); }
