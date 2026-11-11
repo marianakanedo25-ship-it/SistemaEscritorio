@@ -9,6 +9,11 @@ import { salvarEvento, excluirEvento } from './actions';
 
 export const metadata = { title: 'Agenda' };
 
+// "13:00–15:30" e a duração em minutos de um compromisso com horário
+const hm = (h) => (h ? String(h).slice(0, 5) : '');
+const faixa = (ev) => (ev.hora ? hm(ev.hora) + (ev.hora_fim ? '–' + hm(ev.hora_fim) : '') : '');
+const minutos = (ev) => { if (!ev.hora || !ev.hora_fim) return 0; const [a, b] = hm(ev.hora).split(':').map(Number); const [c, d] = hm(ev.hora_fim).split(':').map(Number); return Math.max(0, c * 60 + d - (a * 60 + b)); };
+const duracao = (m) => (m ? `${Math.floor(m / 60) ? Math.floor(m / 60) + 'h' : ''}${m % 60 ? String(m % 60).padStart(Math.floor(m / 60) ? 2 : 1, '0') + (Math.floor(m / 60) ? '' : 'min') : ''}` : '');
 const isoOk = (s) => (typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : null);
 function domingoDe(iso) {
   const d = new Date(iso + 'T12:00:00Z');
@@ -39,7 +44,7 @@ export default async function AgendaPage({ searchParams }) {
        WHERE e.prazo BETWEEN $1 AND $2 OR e.inicio BETWEEN $1 AND $2 OR (e.inicio < $1 AND e.prazo > $2)
        ORDER BY coalesce(e.inicio, e.prazo), p.nome`, [ini, fim]),
     q(`SELECT ev.*, p.nome AS projeto, p.cor FROM eventos ev LEFT JOIN projetos p ON p.id = ev.projeto_id
-       WHERE ev.data BETWEEN $1 AND $2 ORDER BY ev.data, ev.hora NULLS FIRST`, [ini, fim]),
+       WHERE ev.data BETWEEN $1 AND $2 ORDER BY ev.data, ev.hora NULLS LAST`, [ini, fim]),
     q(`SELECT id, nome FROM projetos WHERE status <> 'concluido' ORDER BY nome`),
   ]);
   const financeiro = fin ? await q(
@@ -84,14 +89,14 @@ export default async function AgendaPage({ searchParams }) {
       const meio = it.marca === 'meio';
       const rot = ini ? 'Início: ' : meio ? '' : it.marca === 'fim' && it.inicio ? 'Prazo: ' : '';
       const periodo = it.inicio && it.inicio !== it.prazo ? ` · ${data(it.inicio).slice(0, 5)} a ${it.prazo ? data(it.prazo).slice(0, 5) : '—'}` : '';
-      return <Link href={`/projetos/${it.projeto_id}#etapas`} className={'ev' + (ini ? ' inicio' : '') + (meio ? ' meio' : '') + (it.status === 'concluida' ? ' done' : '') + (late && !ini && !meio ? ' late' : '')} style={{ '--c': it.cor }} title={`${rot}${it.nome} · ${it.projeto}${periodo} · ${STATUS_ETAPA[it.status]}`}>{rot}{curto ? it.nome : `${it.nome} · ${it.projeto}`}</Link>;
+      return <Link href={qs({ d: it.data }) + '#dia'} className={'ev' + (ini ? ' inicio' : '') + (meio ? ' meio' : '') + (it.status === 'concluida' ? ' done' : '') + (late && !ini && !meio ? ' late' : '')} style={{ '--c': it.cor }} title={`${rot}${it.nome} · ${it.projeto}${periodo} · ${STATUS_ETAPA[it.status]} — clique para reservar horário`}>{rot}{curto ? it.nome : `${it.nome} · ${it.projeto}`}</Link>;
     }
     if (it.tipo === 'evento') {
       // Clicar no compromisso abre a edição (com Excluir) direto do calendário
       async function del() { 'use server'; await excluirEvento(it.id); }
       return (
         <Modal titulo="Editar compromisso" classe="ev ev-btn" estilo={{ '--c': it.cor || '#5E564F' }} dica={`${it.titulo}${it.projeto ? ' · ' + it.projeto : ''} — clique para editar`}
-          botao={<>{it.hora ? it.hora.slice(0, 5) + ' ' : ''}{it.titulo}</>} action={salvarEvento} extraFoot={<ConfirmButton action={del} />}>
+          botao={<>{faixa(it) ? faixa(it) + ' ' : ''}{it.titulo}</>} action={salvarEvento} extraFoot={<ConfirmButton action={del} />}>
           <EventoCampos e={{ ...it, tipo: it.tipoEvento || it.tipo }} projetos={projetos} />
         </Modal>
       );
@@ -104,6 +109,7 @@ export default async function AgendaPage({ searchParams }) {
   const dias = [];
   for (let d = ini; d <= fim; d = addDias(d, 1)) dias.push(d);
   const itensDia = dia ? porDia[dia] || [] : [];
+  const minDia = itensDia.filter((it) => it.tipo === 'evento').reduce((t, it) => t + minutos(it), 0);
   const eventosPeriodo = eventos.filter((e) => vista === 'semana' || e.data.slice(0, 7) === ym);
 
   return (
@@ -180,7 +186,7 @@ export default async function AgendaPage({ searchParams }) {
                 <div className="li" key={'lp' + it.id}>
                   <div className="t" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                     <span className="dot" style={{ background: it.cor || 'var(--side)' }} />
-                    <div><strong>{data(it.data).slice(0, 5)}{it.hora ? ' · ' + it.hora.slice(0, 5) : ''} · {it.titulo}</strong>
+                    <div><strong>{data(it.data).slice(0, 5)}{faixa(it) ? ' · ' + faixa(it) : ''} · {it.titulo}</strong>
                       <span className="small">{TIPOS_EVENTO[it.tipoEvento || it.tipo] || 'Compromisso'}{it.projeto ? ' · ' + it.projeto : ''}{it.local ? ' · ' + it.local : ''}</span></div>
                   </div>
                   <div className="actions" style={{ flexWrap: 'nowrap' }}>
@@ -199,7 +205,7 @@ export default async function AgendaPage({ searchParams }) {
       {dia && (
         <section className="card pad" id="dia">
           <div className="card-head">
-            <h2>{dataExtenso(dia)}</h2>
+            <div><h2>{dataExtenso(dia)}</h2>{minDia > 0 && <span className="small">{duracao(minDia)} de horários marcados neste dia</span>}</div>
             <Modal titulo="Novo compromisso" botao="+ Compromisso neste dia" classe="btn sm" action={salvarEvento}>
               <EventoCampos projetos={projetos} dataPadrao={dia} />
             </Modal>
@@ -213,8 +219,8 @@ export default async function AgendaPage({ searchParams }) {
                     <div className="li" key={'e' + it.id}>
                       <div className="t" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                         <span className="dot" style={{ background: it.cor || 'var(--side)' }} />
-                        <div><strong>{it.hora ? it.hora.slice(0, 5) + ' · ' : ''}{it.titulo}</strong>
-                          <span className="small">{TIPOS_EVENTO[it.tipoEvento || it.tipo] || 'Compromisso'}{it.projeto ? ' · ' + it.projeto : ''}{it.local ? ' · ' + it.local : ''}</span>
+                        <div><strong>{faixa(it) ? faixa(it) + ' · ' : ''}{it.titulo}</strong>
+                          <span className="small">{minutos(it) ? duracao(minutos(it)) + ' · ' : ''}{TIPOS_EVENTO[it.tipoEvento || it.tipo] || 'Compromisso'}{it.projeto ? ' · ' + it.projeto : ''}{it.local ? ' · ' + it.local : ''}</span>
                           {it.obs && <span className="small">{it.obs}</span>}</div>
                       </div>
                       <Modal titulo="Editar compromisso" botao="Editar" classe="btn sm" action={salvarEvento} extraFoot={<ConfirmButton action={del} />}>
@@ -229,7 +235,14 @@ export default async function AgendaPage({ searchParams }) {
                       <span className="dot" style={{ background: it.cor }} />
                       <div><strong>{it.marca === 'inicio' ? 'Início' : it.marca === 'meio' ? 'Em andamento' : 'Prazo'}: {it.nome}</strong><span className="small"><Link href={`/projetos/${it.projeto_id}#etapas`}>{it.projeto}</Link>{it.inicio && it.inicio !== it.prazo ? ` · de ${data(it.inicio)} a ${it.prazo ? data(it.prazo) : 'sem prazo'}` : ''}</span></div>
                     </div>
-                    <span className={'tag ' + (it.status === 'concluida' ? 'ok' : it.prazo && it.prazo < hj ? 'bad' : 'warn')}>{it.status === 'concluida' ? 'Concluída' : it.prazo && it.prazo < hj ? 'Atrasada' : STATUS_ETAPA[it.status]}</span>
+                    <div className="actions" style={{ flexWrap: 'nowrap', alignItems: 'center' }}>
+                      <span className={'tag ' + (it.status === 'concluida' ? 'ok' : it.prazo && it.prazo < hj ? 'bad' : 'warn')}>{it.status === 'concluida' ? 'Concluída' : it.prazo && it.prazo < hj ? 'Atrasada' : STATUS_ETAPA[it.status]}</span>
+                      {it.status !== 'concluida' && (
+                        <Modal titulo={`Reservar horário · ${it.nome}`} botao="Reservar horário" classe="btn sm" action={salvarEvento} enviar="Reservar">
+                          <EventoCampos e={{ titulo: `${it.nome} · ${it.projeto}`, tipo: 'trabalho', projeto_id: it.projeto_id, etapa_id: it.id }} projetos={projetos} dataPadrao={dia} />
+                        </Modal>
+                      )}
+                    </div>
                   </div>
                 );
                 return (

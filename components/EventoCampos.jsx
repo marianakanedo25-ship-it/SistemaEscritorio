@@ -1,15 +1,17 @@
 import { hoje } from '@/lib/format';
 
-export const TIPOS_EVENTO = { compromisso: 'Compromisso', reuniao: 'Reunião', visita: 'Visita de obra', entrega: 'Entrega', medicao: 'Levantamento / medição', pessoal: 'Pessoal', outro: 'Outro' };
+export const TIPOS_EVENTO = { trabalho: 'Horário de trabalho', compromisso: 'Compromisso', reuniao: 'Reunião', visita: 'Visita de obra', entrega: 'Entrega', medicao: 'Levantamento / medição', pessoal: 'Pessoal', outro: 'Outro' };
 
 export default function EventoCampos({ e = {}, projetos = [], fixo = {}, dataPadrao }) {
   return (
     <div className="form">
       {e.id && <input type="hidden" name="id" value={e.id} />}
+      {e.etapa_id && !('etapa_id' in fixo) && <input type="hidden" name="etapa_id" value={e.etapa_id} />}
       {Object.entries(fixo).map(([k, v]) => <input key={k} type="hidden" name={k} value={v ?? ''} />)}
       <label className="fld full"><span>Título *</span><input name="titulo" required defaultValue={e.titulo || ''} placeholder="Ex.: Reunião com fornecedor, dentista, visita à loja" /></label>
       <label className="fld"><span>Data *</span><input name="data" type="date" required defaultValue={e.data || dataPadrao || hoje()} /></label>
-      <label className="fld"><span>Horário</span><input name="hora" type="time" defaultValue={e.hora || ''} /></label>
+      <label className="fld"><span>Das</span><input name="hora" type="time" defaultValue={(e.hora || '').slice(0, 5)} /></label>
+      <label className="fld"><span>Até</span><input name="hora_fim" type="time" defaultValue={(e.hora_fim || '').slice(0, 5)} /></label>
       <label className="fld"><span>Tipo</span>
         <select name="tipo" defaultValue={e.tipo || 'compromisso'}>{Object.entries(TIPOS_EVENTO).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
       </label>
