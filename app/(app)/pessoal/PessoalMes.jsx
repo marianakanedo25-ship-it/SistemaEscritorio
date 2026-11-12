@@ -77,9 +77,9 @@ export default function PessoalMes({ mes, inicial, saldoAuto, saldoManualInicial
           <div className="pf-termo"><span className="lbl">Gastos</span><span className="pf-val">{brl(r.gastos)}</span><span className="hint">contas {brl(r.contas)} · cartão {brl(r.cartao)}</span></div>
           <span className="pf-op">−</span>
           <div className="pf-termo"><span className="lbl">Investido</span><span className="pf-val">{brl(r.investimentos)}</span><span className="hint">para a XP</span></div>
-          {r.extras > 0 && <>
-            <span className="pf-op">−</span>
-            <div className="pf-termo"><span className="lbl">Fora do plano</span><span className="pf-val neg">{brl(r.extras)}</span><span className="hint">gastos não previstos</span></div>
+          {(r.extras > 0 || r.extrasEntrada > 0) && <>
+            <span className="pf-op">{r.extrasEntrada - r.extras >= 0 ? '+' : '−'}</span>
+            <div className="pf-termo"><span className="lbl">Fora do plano</span><span className={'pf-val ' + (r.extrasEntrada - r.extras >= 0 ? 'pos' : 'neg')}>{brl(Math.abs(r.extrasEntrada - r.extras))}</span><span className="hint">{r.extrasEntrada > 0 ? `entrou ${brl(r.extrasEntrada)}` : ''}{r.extrasEntrada > 0 && r.extras > 0 ? ' · ' : ''}{r.extras > 0 ? `gastos ${brl(r.extras)}` : ''}</span></div>
           </>}
           <span className="pf-op">=</span>
           <div className="pf-termo pf-sobra"><span className="lbl">Vai sobrar</span><span className={'pf-val ' + (r.sobra < 0 ? 'neg' : 'pos')}>{brl(r.sobra)}</span><span className="hint">passa para o próximo mês</span></div>
@@ -91,37 +91,45 @@ export default function PessoalMes({ mes, inicial, saldoAuto, saldoManualInicial
         </div>
       </section>
 
-      <section className="card pf-extra" aria-label="Gastos fora do plano">
+      <section className="card pf-extra" aria-label="Fora do plano">
         <header className="pf-head">
-          <div><h2>Gastos fora do plano</h2><span className="small">O que você gastou e não estava previsto neste mês</span></div>
+          <div><h2>Fora do plano</h2><span className="small">Dinheiro que entrou e gastos que você não tinha previsto neste mês</span></div>
         </header>
         <div className="pf-extra-ini"><span>Sobra do mês pelo planejado</span><strong className="num">{brl(r.sobraPlanejada)}</strong></div>
-        <div className="table-wrap">
-          <table className="tbl pf-tbl">
-            <thead><tr><th>O que foi</th><th className="r" style={{ width: 120 }}>Valor</th><th style={{ width: 110 }}>Dia do gasto</th><th style={{ width: 34 }}></th></tr></thead>
-            <tbody>
-              {linhas.filter((l) => l.tipo === 'extra').map((l) => (
-                <tr key={l.key}>
-                  <td><input style={inp} value={l.descricao} placeholder="Ex.: farmácia, presente, conserto" onChange={(e) => setL(l.key, { descricao: e.target.value })} aria-label="O que foi" /></td>
-                  <td><input style={{ ...inp, textAlign: 'right' }} type="number" step="0.01" min="0" value={l.valor} placeholder="0,00" onChange={(e) => setL(l.key, { valor: e.target.value })} aria-label="Valor" /></td>
-                  <td>
-                    <label className="pf-data-gasto" title="Dia em que gastou — clique para alterar">
-                      {l.data ? l.data.split('-').reverse().join('/') : 'escolher'}
-                      <input type="date" value={l.data || ''} onChange={(e) => setL(l.key, { data: e.target.value })} onClick={(e) => { try { e.currentTarget.showPicker?.(); } catch {} }} aria-label={`Dia do gasto: ${l.descricao || 'item'}`} />
-                    </label>
-                  </td>
-                  <td className="r"><button type="button" className="btn ghost sm" onClick={() => del(l.key)} aria-label="Remover linha">✕</button></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="pf-add"><button type="button" className="btn ghost sm" onClick={() => { setLinhas((ls) => [...ls, nova('extra', { feito: true, data: hoje() })]); mudou(); }}>+ Adicionar gasto</button></div>
+        {[
+          { tipo: 'extra_entrada', titulo: 'Entrou fora do plano', sinal: '+', classe: 'pos', ex: 'Ex.: venda, presente, reembolso, comissão', dia: 'Dia que entrou', botao: '+ Adicionar entrada', total: r.extrasEntrada },
+          { tipo: 'extra', titulo: 'Gastos fora do plano', sinal: '−', classe: 'neg', ex: 'Ex.: farmácia, presente, conserto', dia: 'Dia do gasto', botao: '+ Adicionar gasto', total: r.extras },
+        ].map((g) => (
+          <div key={g.tipo} className="pf-fora">
+            <h3 className="pf-fora-tit"><span>{g.sinal} {g.titulo}</span>{g.total > 0 && <strong className={'num ' + g.classe}>{g.sinal} {brl(g.total)}</strong>}</h3>
+            <div className="table-wrap">
+              <table className="tbl pf-tbl">
+                <thead><tr><th>O que foi</th><th className="r" style={{ width: 120 }}>Valor</th><th style={{ width: 110 }}>{g.dia}</th><th style={{ width: 34 }}></th></tr></thead>
+                <tbody>
+                  {linhas.filter((l) => l.tipo === g.tipo).map((l) => (
+                    <tr key={l.key}>
+                      <td><input style={inp} value={l.descricao} placeholder={g.ex} onChange={(e) => setL(l.key, { descricao: e.target.value })} aria-label="O que foi" /></td>
+                      <td><input style={{ ...inp, textAlign: 'right' }} type="number" step="0.01" min="0" value={l.valor} placeholder="0,00" onChange={(e) => setL(l.key, { valor: e.target.value })} aria-label="Valor" /></td>
+                      <td>
+                        <label className="pf-data-gasto" title="Clique para alterar a data">
+                          {l.data ? l.data.split('-').reverse().join('/') : 'escolher'}
+                          <input type="date" value={l.data || ''} onChange={(e) => setL(l.key, { data: e.target.value })} onClick={(e) => { try { e.currentTarget.showPicker?.(); } catch {} }} aria-label={`${g.dia}: ${l.descricao || 'item'}`} />
+                        </label>
+                      </td>
+                      <td className="r"><button type="button" className="btn ghost sm" onClick={() => del(l.key)} aria-label="Remover linha">✕</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="pf-add"><button type="button" className="btn ghost sm" onClick={() => { setLinhas((ls) => [...ls, nova(g.tipo, { feito: true, data: hoje() })]); mudou(); }}>{g.botao}</button></div>
+          </div>
+        ))}
         <div className="pf-extra-fim">
           <span>Ainda sobra</span>
           <strong className={'num ' + (r.sobra < 0 ? 'neg' : 'pos')}>{brl(r.sobra)}</strong>
         </div>
-        {r.extras > 0 && <p className="small" style={{ margin: '0 18px 14px', textAlign: 'right' }}>{brl(r.sobraPlanejada)} − {brl(r.extras)} em gastos fora do plano</p>}
+        {(r.extras > 0 || r.extrasEntrada > 0) && <p className="small" style={{ margin: '0 18px 14px', textAlign: 'right' }}>{brl(r.sobraPlanejada)}{r.extrasEntrada > 0 ? ` + ${brl(r.extrasEntrada)} que entrou` : ''}{r.extras > 0 ? ` − ${brl(r.extras)} gastos` : ''} fora do plano</p>}
       </section>
 
       {podeComecar && (

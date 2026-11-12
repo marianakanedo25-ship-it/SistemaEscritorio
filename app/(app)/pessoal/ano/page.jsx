@@ -38,7 +38,7 @@ export default async function PessoalAnoPage() {
                     <td className="r num">{brl(r.contas)}</td>
                     <td className="r num">{brl(r.cartao)}</td>
                     <td className="r num">{brl(r.investimentos)}</td>
-                    <td className={'r num ' + (r.extras > 0 ? 'neg' : '')}>{brl(r.extras)}</td>
+                    <td className={'r num ' + (r.extrasEntrada - r.extras < 0 ? 'neg' : r.extrasEntrada - r.extras > 0 ? 'pos' : '')}>{brl(r.extrasEntrada - r.extras)}</td>
                     <td className={'r num ' + (r.sobra < 0 ? 'neg' : '')} style={{ fontWeight: 600 }}>{brl(r.sobra)}</td>
                     <td className={'r num ' + (r.aPagar > 0 ? 'wrn' : '')}>{brl(r.aPagar)}</td>
                   </>
@@ -46,7 +46,7 @@ export default async function PessoalAnoPage() {
               </tr>
             ))}
           </tbody>
-          <tfoot><tr><td><strong>Total</strong></td><td></td><td className="r num pos"><strong>{brl(soma('entradas'))}</strong></td><td className="r num"><strong>{brl(soma('contas'))}</strong></td><td className="r num"><strong>{brl(soma('cartao'))}</strong></td><td className="r num"><strong>{brl(soma('investimentos'))}</strong></td><td className="r num"><strong>{brl(soma('extras'))}</strong></td><td></td><td></td></tr></tfoot>
+          <tfoot><tr><td><strong>Total</strong></td><td></td><td className="r num pos"><strong>{brl(soma('entradas'))}</strong></td><td className="r num"><strong>{brl(soma('contas'))}</strong></td><td className="r num"><strong>{brl(soma('cartao'))}</strong></td><td className="r num"><strong>{brl(soma('investimentos'))}</strong></td><td className="r num"><strong>{brl(soma('extrasEntrada') - soma('extras'))}</strong></td><td></td><td></td></tr></tfoot>
         </table>
       </div>
     </>

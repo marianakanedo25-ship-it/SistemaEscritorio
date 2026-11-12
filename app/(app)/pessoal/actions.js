@@ -5,7 +5,7 @@ import { exigir } from '@/lib/auth';
 import { TIPOS, linhasDoProximoMes, interpretarPlanilha } from '@/lib/pessoal';
 import { lerXlsx, dataExcel } from '@/lib/xlsx-lite';
 
-const TIPOS_OK = new Set([...TIPOS.map((t) => t.id), 'extra']);
+const TIPOS_OK = new Set([...TIPOS.map((t) => t.id), 'extra', 'extra_entrada']);
 const mesOk = (m) => /^\d{4}-(0[1-9]|1[0-2])$/.test(String(m || ''));
 const dataOk = (d) => (/^\d{4}-\d{2}-\d{2}$/.test(String(d || '')) ? d : null);
 

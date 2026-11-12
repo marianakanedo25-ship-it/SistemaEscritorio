@@ -450,7 +450,7 @@ button.ev-btn:hover { filter: brightness(1.12); }
 .pf-extra-fim { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 6px 16px 10px; padding: 14px 16px; background: var(--primary-soft); border-radius: 10px; }
 .pf-extra-fim span { font-size: 16px; font-weight: 500; }
 .pf-extra-fim strong { font-family: var(--f-display); font-size: 34px; font-weight: 600; line-height: 1.1; }
-@media (max-width: 600px) { .pf-extra .pf-tbl th:nth-child(2) { width: 78px !important; } .pf-extra .pf-tbl th:nth-child(3) { width: 84px !important; } .pf-extra .pf-tbl th:nth-child(4) { width: 30px !important; } .pf-extra-fim strong { font-size: 28px; } }
+@media (max-width: 600px) { .pf-extra .pf-tbl { table-layout: fixed; width: 100%; } .pf-extra .pf-tbl th:nth-child(2) { width: 78px !important; } .pf-extra .pf-tbl th:nth-child(3) { width: 84px !important; } .pf-extra .pf-tbl th:nth-child(4) { width: 30px !important; } .pf-extra-fim strong { font-size: 28px; } }
 .pf-data-gasto { position: relative; display: inline-block; padding: 6px 4px; color: var(--ink); cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .pf-data-gasto input { position: absolute; inset: 0; width: 100% !important; height: 100%; opacity: 0; cursor: pointer; padding: 0 !important; border: 0 !important; }
 .pf-falta { font-weight: 600; }
@@ -463,3 +463,7 @@ button.ev-btn:hover { filter: brightness(1.12); }
 .proj-card { background: color-mix(in srgb, var(--c, var(--sage)) 15%, #fff); }
 .proj-card:hover { background: color-mix(in srgb, var(--c, var(--sage)) 21%, #fff); }
 .proj-card .tag { background: color-mix(in srgb, var(--c, var(--sage)) 24%, #fff); }
+
+.pf-fora { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 4px; }
+.pf-fora-tit { display: flex; justify-content: space-between; gap: 10px; margin: 8px 16px 2px; font-family: var(--f-body); font-size: 15px; font-weight: 600; }
+.pf-fora-tit strong { font-size: 15px; }
