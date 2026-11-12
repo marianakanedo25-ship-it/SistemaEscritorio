@@ -10,7 +10,8 @@ import SaveForm from '@/components/SaveForm';
 import ProjetoCampos from '@/components/ProjetoCampos';
 import FinCampos from '@/components/FinCampos';
 import EtapasEditor from './EtapasEditor';
-import { salvarProjeto, salvarEtapas, excluirProjeto, salvarContrato, excluirContrato, gerarParcelas, etapasDoOrcamento, sincronizarEtapasComOrcamento } from '../actions';
+import { salvarProjeto, salvarEtapas, excluirProjeto, salvarContrato, excluirContrato, gerarParcelas, vincularOrcamento } from '../actions';
+import { etapasDoOrcamentoDb, aplicarEtapasDoOrcamento } from '@/lib/etapas-orcamento';
 import { salvarLancamento, alternarPago, excluirLancamento } from '../../financeiro/actions';
 import { salvarEvento } from '../../agenda/actions';
 import EventoCampos from '@/components/EventoCampos';
@@ -40,16 +41,19 @@ export default async function ProjetoPage({ params }) {
   const { id } = await params;
   const p = await one('SELECT p.*, c.nome AS cliente FROM projetos p LEFT JOIN clientes c ON c.id = p.cliente_id WHERE p.id = $1', [Number(id) || 0]);
   if (!p) notFound();
+  // Se o projeto tem orçamento da calculadora, ficam só as etapas marcadas nele (automático)
+  await aplicarEtapasDoOrcamento(p.id);
   const [etapas, contratos, eventos, clientes] = await Promise.all([
     q('SELECT id, nome, inicio, prazo, status FROM etapas WHERE projeto_id = $1 ORDER BY ordem, id', [p.id]),
     q('SELECT * FROM contratos WHERE projeto_id = $1 ORDER BY criado_em DESC', [p.id]),
     q('SELECT id, titulo, data, hora, tipo, local FROM eventos WHERE projeto_id = $1 AND data >= $2 ORDER BY data, hora LIMIT 8', [p.id, hoje()]),
     q('SELECT id, nome FROM clientes ORDER BY lower(nome)'),
   ]);
-  const orcEtapas = await etapasDoOrcamento(p.id);
-  const sobrando = orcEtapas ? etapas.filter((e) => orcEtapas.todas.includes(e.nome) && !orcEtapas.validas.includes(e.nome)) : [];
-  const faltando = orcEtapas ? orcEtapas.validas.filter((n) => !etapas.some((e) => e.nome === n)) : [];
-  async function sincronizar() { 'use server'; await sincronizarEtapasComOrcamento(p.id); }
+  const orcEtapas = await etapasDoOrcamentoDb(p.id);
+  // Sem orçamento vinculado: oferece os orçamentos da calculadora que ainda não têm projeto (os do mesmo cliente primeiro)
+  const orcLivres = orcEtapas ? [] : await q(`SELECT o.id, o.nome, o.data, o.valor, c.nome AS cliente, (o.cliente_id = $1) AS mesmo
+    FROM orcamentos o LEFT JOIN clientes c ON c.id = o.cliente_id WHERE o.projeto_id IS NULL ORDER BY (o.cliente_id = $1) DESC NULLS LAST, o.id DESC LIMIT 30`, [p.cliente_id || 0]);
+  const vincular = vincularOrcamento.bind(null, p.id);
   const verFin = podeVer(u, 'financeiro');
   const [receitas, custos] = verFin ? await Promise.all([
     q('SELECT * FROM receitas WHERE projeto_id = $1 ORDER BY vencimento, id', [p.id]),
@@ -103,14 +107,17 @@ export default async function ProjetoPage({ params }) {
       <div className="stack">
         <section className="card pad" id="etapas">
           <div className="card-head"><h2>Etapas e prazos</h2><span className="small">Os prazos aparecem na Agenda com a cor do projeto.</span></div>
-          {(sobrando.length > 0 || faltando.length > 0) && (
-            <div className="notice" style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}>
-              <span>
-                {sobrando.length > 0 && <>{sobrando.length} etapa{sobrando.length > 1 ? 's estão' : ' está'} desmarcada{sobrando.length > 1 ? 's' : ''} ou sem horas no orçamento ({sobrando.map((e) => e.nome).join(', ')}). </>}
-                {faltando.length > 0 && <>{faltando.length} etapa{faltando.length > 1 ? 's' : ''} do orçamento ainda não {faltando.length > 1 ? 'estão' : 'está'} aqui. </>}
-              </span>
-              <ActionButton action={sincronizar} classe="btn sm primary">Usar só as etapas do orçamento</ActionButton>
-            </div>
+          {orcEtapas ? (
+            <p className="small" style={{ margin: '0 0 10px' }}>Só as etapas marcadas com horas no orçamento <strong>{orcEtapas.orcamento.nome || '#' + orcEtapas.orcamento.id}</strong> da calculadora. Para mudar, ajuste o orçamento na Calculadora de precificação.</p>
+          ) : orcLivres.length > 0 && (
+            <form action={vincular} className="notice" style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
+              <span>Este projeto não está ligado a um orçamento da calculadora. Ligue para ficar só com as etapas marcadas nele:</span>
+              <select name="orcamento_id" required defaultValue={orcLivres.find((o) => o.mesmo)?.id || ''} style={{ maxWidth: 340 }}>
+                <option value="">Escolha o orçamento…</option>
+                {orcLivres.map((o) => <option key={o.id} value={o.id}>{o.nome || 'Orçamento #' + o.id}{o.cliente ? ' · ' + o.cliente : ''} · {brl(o.valor)}</option>)}
+              </select>
+              <button className="btn sm primary">Ligar e usar só essas etapas</button>
+            </form>
           )}
           <EtapasEditor key={etapas.map((e) => e.id).join('-')} projetoId={p.id} salvar={salvarEtapas} inicial={etapas.map((e) => ({ key: e.id, nome: e.nome, inicio: e.inicio || '', prazo: e.prazo || '', status: e.status }))} />
         </section>
