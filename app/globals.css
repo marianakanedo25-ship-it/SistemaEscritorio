@@ -467,3 +467,15 @@ button.ev-btn:hover { filter: brightness(1.12); }
 .pf-fora { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 4px; }
 .pf-fora-tit { display: flex; justify-content: space-between; gap: 10px; margin: 8px 16px 2px; font-family: var(--f-body); font-size: 15px; font-weight: 600; }
 .pf-fora-tit strong { font-size: 15px; }
+
+/* ---------- ocultar valores (R$) ---------- */
+.olho { display: inline-flex; align-items: center; gap: 6px; background: rgb(255 255 255 / .08); color: var(--side-ink); border: 1px solid rgb(255 255 255 / .18); border-radius: 999px; padding: 5px 10px; font: inherit; font-size: 12.5px; cursor: pointer; }
+.olho:hover { background: rgb(255 255 255 / .16); }
+.side .who .olho { margin-top: 10px; }
+.topbar .olho span { display: none; }
+.topbar .olho { padding: 7px 9px; }
+.ocultar-valores .vlr,
+.ocultar-valores .pf-tbl input[type=number],
+.ocultar-valores .pf-saldo-inp { filter: blur(7px); user-select: none; transition: filter .15s; }
+@media print { .ocultar-valores .vlr, .ocultar-valores input { filter: none !important; } }
+.ocultar-valores .pf-tbl input[type=number]:focus, .ocultar-valores .pf-saldo-inp:focus { filter: none; }
